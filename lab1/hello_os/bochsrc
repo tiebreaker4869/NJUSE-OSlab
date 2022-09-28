@@ -1,0 +1,7 @@
+megs: 32 # bochs memory size
+
+display_library: sdl # gui display_library
+
+floppya: 1_44=a.img, status=inserted # outside device, floppy disk = a.img
+
+boot: floppy # boot from floppy

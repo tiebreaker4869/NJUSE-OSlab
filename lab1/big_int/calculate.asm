@@ -6,6 +6,7 @@
 %define MAX_LEN 128
 %define ADD_OPERATOR 43
 %define MUL_OPERATOR 42
+%define ZERO_ASCII 48
 
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
@@ -16,6 +17,8 @@ section .data
 section .bss
     operand1: resb 42 
     operand2: resb 42
+    operand1_len: resb 4
+    operand2_len: resb 4
     expression: resb 100
     expression_len: resb 4
     operator_index: resb 4
@@ -90,6 +93,42 @@ GetOperator:
         ret
 
 GetOperands:
+    GetFirstOperand:
+        mov ebx, expression
+        add ebx, dword[operator_index]
+        sub ebx, 1
+        mov edx, operand1
+        mov ecx, 0
+        first_loop:
+            mov al, byte[ebx]
+            sub al, ZERO_ASCII
+            mov byte[edx], al
+            inc ecx
+            cmp expression, ebx
+            jz finish_first
+            dec ebx
+            inc edx
+            jmp first_loop
+        finish_first:
+            mov dword[operand1_len], ecx
+    GetSecondOperand:
+        mov ebx, expression
+        add ebx, expression_len
+        sub ebx, 2
+        mov edx, operand2
+        mov ecx, 0
+        second_loop:
+            mov al, byte[ebx]
+            sub al, ZERO_ASCII
+            mov byte[edx], al
+            inc ecx
+            cmp ebx, expression + operator_index + 1
+            jz finish_second
+            dec ebx
+            inc edx
+            jmp second_loop
+        finish_second:
+            mov dword[operand2_len], ecx
     ret
 
 CheckZero:

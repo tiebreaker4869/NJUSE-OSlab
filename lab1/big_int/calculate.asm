@@ -2,7 +2,7 @@
 %define STDOUT 1
 %define SYS_READ 3
 %define SYS_WRITE 4
-%defind MAX_LEN 128
+%define MAX_LEN 128
 
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
@@ -19,9 +19,22 @@ _start:
     mov ecx, PromptMessage ; 提示字符串地址
     mov edx, PromptMessageEnd - PromptMessage ; 提示字符串长度
     call DispStr
-    
+
     call GetInput
 
+    mov ecx, expression
+    mov edx, eax
+    call DispStr
+
+    ; call GetOperator
+
+    ; call GetOperands
+
+    ; call ValidateInput
+
+    ; call Big_Add
+
+    ; call Big_Mul
 
 DispStr:
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)
@@ -36,3 +49,15 @@ GetInput:
     mov edx, MAX_LEN ; 最大长度
     int 80h ; 陷入内核
     ret
+
+GetOperator:
+
+GetOperands:
+
+ValidateInput:
+
+CheckZero:
+
+Big_Add:
+
+Big_Mul:

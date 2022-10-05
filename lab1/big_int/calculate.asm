@@ -10,11 +10,15 @@
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
     PromptMessageEnd:
+    NO_OPERATOR_MSG: db "Invalid expression: No valid operator found.", 0ah
+    NO_OPERATOR_MSG_END:
 
 section .bss
     operand1: resb 42 
     operand2: resb 42
     expression: resb 100
+    expression_len: resb 1
+    operator_index: resb 1
 
 section .text
     global _start
@@ -25,15 +29,15 @@ _start:
 
     call GetInput
 
-    ; test GetInput
-    ; mov ecx, expression
-    ; mov edx, eax
-    ; call DispStr
-    ; test GetInput
-
     call GetOperator
 
-    ; call GetOperands
+    cmp eax, 2
+    mov ecx, NO_OPERATOR_MSG
+    mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
+    call DispStr
+    jz EXIT
+
+    call GetOperands
 
     ; call ValidateInput
 
@@ -41,10 +45,8 @@ _start:
 
     ; call Big_Mul
 
-    ; 退出程序
-    mov ebx, 0							; 参数一：退出代码
-    mov eax, SYS_EXIT							; 系统调用号(sys_exit)
-    int 0x80
+    jmp EXIT; 退出程序
+    
 
 DispStr:
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)
@@ -58,6 +60,7 @@ GetInput:
     mov ecx, expression ; 存储输入字符串的地址
     mov edx, MAX_LEN ; 最大长度
     int 80h ; 陷入内核
+    mov byte[expression_len], eax
     ret
 
 GetOperator:
@@ -75,9 +78,11 @@ GetOperator:
         inc ecx
         jmp begin_loop
     find_add:
+        mov byte[operator_index], ecx
         mov eax, 0 ; find '+'
         ret
     find_mul:
+        mov byte[operator_index], ecx
         mov eax, 1 ; find '*'
         ret
     not_found:
@@ -85,11 +90,15 @@ GetOperator:
         ret
 
 GetOperands:
-
-ValidateInput:
+    ret
 
 CheckZero:
 
 Big_Add:
 
 Big_Mul:
+
+EXIT:
+    mov ebx, 0							; 参数一：退出代码
+    mov eax, SYS_EXIT							; 系统调用号(sys_exit)
+    int 0x80

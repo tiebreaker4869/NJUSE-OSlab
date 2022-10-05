@@ -4,6 +4,8 @@
 %define SYS_WRITE 4
 %define SYS_EXIT 1
 %define MAX_LEN 128
+%define ADD_OPERATOR 43
+%define MUL_OPERATOR 42
 
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
@@ -23,11 +25,13 @@ _start:
 
     call GetInput
 
-    mov ecx, expression
-    mov edx, eax
-    call DispStr
+    ; test GetInput
+    ; mov ecx, expression
+    ; mov edx, eax
+    ; call DispStr
+    ; test GetInput
 
-    ; call GetOperator
+    call GetOperator
 
     ; call GetOperands
 
@@ -57,6 +61,28 @@ GetInput:
     ret
 
 GetOperator:
+    mov ebx, expression
+    mov ecx, 0
+    begin_loop:
+        mov edx, ecx
+        add edx, expression
+        cmp byte[edx], 0
+        jz not_found
+        cmp byte[edx], ADD_OPERATOR
+        jz find_add
+        cmp byte[edx], MUL_OPERATOR
+        jz find_mul
+        inc ecx
+        jmp begin_loop
+    find_add:
+        mov eax, 0 ; find '+'
+        ret
+    find_mul:
+        mov eax, 1 ; find '*'
+        ret
+    not_found:
+        mov eax, 2 ; no operator
+        ret
 
 GetOperands:
 

@@ -17,8 +17,8 @@ section .bss
     operand1: resb 42 
     operand2: resb 42
     expression: resb 100
-    expression_len: resb 1
-    operator_index: resb 1
+    expression_len: resb 4
+    operator_index: resb 4
 
 section .text
     global _start
@@ -60,7 +60,7 @@ GetInput:
     mov ecx, expression ; 存储输入字符串的地址
     mov edx, MAX_LEN ; 最大长度
     int 80h ; 陷入内核
-    mov byte[expression_len], eax
+    mov dword[expression_len], eax
     ret
 
 GetOperator:
@@ -78,11 +78,11 @@ GetOperator:
         inc ecx
         jmp begin_loop
     find_add:
-        mov byte[operator_index], ecx
+        mov dword[operator_index], ecx
         mov eax, 0 ; find '+'
         ret
     find_mul:
-        mov byte[operator_index], ecx
+        mov dword[operator_index], ecx
         mov eax, 1 ; find '*'
         ret
     not_found:

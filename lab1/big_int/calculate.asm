@@ -2,6 +2,7 @@
 %define STDOUT 1
 %define SYS_READ 3
 %define SYS_WRITE 4
+%define SYS_EXIT 1
 %define MAX_LEN 128
 
 section .data
@@ -35,6 +36,11 @@ _start:
     ; call Big_Add
 
     ; call Big_Mul
+
+    ; 退出程序
+    mov ebx, 0							; 参数一：退出代码
+    mov eax, SYS_EXIT							; 系统调用号(sys_exit)
+    int 0x80
 
 DispStr:
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)

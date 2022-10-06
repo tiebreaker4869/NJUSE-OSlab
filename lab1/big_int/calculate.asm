@@ -155,7 +155,7 @@ CheckZero: ; 操作数地址放在 ecx, 操作数长度放在 edx
     check_loop:
         cmp ebx, edx
         jz is_zero
-        cmp byte[ecx], ZERO_ASCII
+        cmp byte[ecx], 0
         jne not_zero
         inc ebx
         inc ecx

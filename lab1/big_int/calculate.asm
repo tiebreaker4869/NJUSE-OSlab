@@ -99,9 +99,7 @@ GetOperands:
         mov ecx, 0
         first_loop:
             mov al, byte[ebx]
-            push al
-            call ValidateDigit
-            pop al
+            call ValidateDigit ; 检查该位是不是数字
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
@@ -121,9 +119,7 @@ GetOperands:
         mov ecx, 0
         second_loop:
             mov al, byte[ebx]
-            push al
             call ValidateDigit
-            pop al
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
@@ -139,7 +135,22 @@ GetOperands:
             mov dword[operand2_len], ecx
     ret
 
-CheckZero:
+CheckZero: ; 操作数地址放在 ecx, 操作数长度放在 edx
+    mov ebx, 0
+    check_loop:
+        cmp ebx, dword[edx]
+        jz is_zero
+        cmp byte[ecx], ZERO_ASCII
+        jne not_zero
+        inc ebx
+        inc ecx
+        jmp check_loop
+    is_zero:
+        mov eax, 0
+        ret
+    not_zero:
+        mov eax, 1
+        ret
 
 Big_Add:
 

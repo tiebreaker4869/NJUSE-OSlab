@@ -153,7 +153,7 @@ GetOperands:
 CheckZero: ; 操作数地址放在 ecx, 操作数长度放在 edx
     mov ebx, 0
     check_loop:
-        cmp ebx, dword[edx]
+        cmp ebx, edx
         jz is_zero
         cmp byte[ecx], ZERO_ASCII
         jne not_zero

@@ -7,12 +7,15 @@
 %define ADD_OPERATOR 43
 %define MUL_OPERATOR 42
 %define ZERO_ASCII 48
+%define NINE_ASCII 57
 
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
     PromptMessageEnd:
     NO_OPERATOR_MSG: db "Invalid expression: No valid operator found.", 0ah
     NO_OPERATOR_MSG_END:
+    OPERAND_NOT_VALID_MSG: db "Invalid expression: Operands not valid.", 0ah
+    OPERAND_NOT_VALID_MSG_END:
 
 section .bss
     operand1: resb 42 
@@ -38,8 +41,6 @@ _start:
     jz EXIT_NO_OPERATOR
 
     call GetOperands
-
-    ; call ValidateInput
 
     ; call Big_Add
 
@@ -98,6 +99,9 @@ GetOperands:
         mov ecx, 0
         first_loop:
             mov al, byte[ebx]
+            push al
+            call ValidateDigit
+            pop al
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
@@ -117,6 +121,9 @@ GetOperands:
         mov ecx, 0
         second_loop:
             mov al, byte[ebx]
+            push al
+            call ValidateDigit
+            pop al
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
@@ -137,6 +144,7 @@ CheckZero:
 Big_Add:
 
 Big_Mul:
+    
 
 EXIT:
     mov ebx, 0							; 参数一：退出代码
@@ -147,4 +155,18 @@ EXIT_NO_OPERATOR:
     mov ecx, NO_OPERATOR_MSG
     mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
     call DispStr
-    jz EXIT
+    jmp EXIT
+
+EXIT_OPERAND_NOT_VALID:
+    mov ecx, OPERAND_NOT_VALID_MSG
+    mov edx, OPERAND_NOT_VALID_MSG_END - OPERAND_NOT_VALID_MSG
+    call DispStr
+    jmp EXIT
+
+ValidateDigit:
+    cmp al, ZERO_ASCII
+    jb EXIT_OPERAND_NOT_VALID
+    cmp al, NINE_ASCII
+    ja EXIT_OPERAND_NOT_VALID
+    ret
+

@@ -243,9 +243,9 @@ Big_Add:
 
 
 Check_Out_Of_Bound: ; offset in ecx
-    cmp dword[operand1_len], ecx
+    cmp ecx, dword[operand1_len]
     jb not_out_of_bound
-    cmp dword[operand2_len], ecx
+    cmp ecx, dword[operand2_len]
     jb not_out_of_bound
     jmp out_of_bound 
     not_out_of_bound:

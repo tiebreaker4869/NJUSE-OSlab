@@ -35,10 +35,7 @@ _start:
     call GetOperator
 
     cmp eax, 2
-    mov ecx, NO_OPERATOR_MSG
-    mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
-    call DispStr
-    jz EXIT
+    jz EXIT_NO_OPERATOR
 
     call GetOperands
 
@@ -145,3 +142,9 @@ EXIT:
     mov ebx, 0							; 参数一：退出代码
     mov eax, SYS_EXIT							; 系统调用号(sys_exit)
     int 0x80
+
+EXIT_NO_OPERATOR:
+    mov ecx, NO_OPERATOR_MSG
+    mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
+    call DispStr
+    jz EXIT

@@ -111,7 +111,7 @@ GetOperands:
             mov dword[operand1_len], ecx
     GetSecondOperand:
         mov ebx, expression
-        add ebx, expression_len
+        add ebx, dword[expression_len]
         sub ebx, 2
         mov edx, operand2
         mov ecx, 0
@@ -121,7 +121,7 @@ GetOperands:
             mov byte[edx], al
             inc ecx
             mov eax, expression
-            add eax, operator_index
+            add eax, dword[operator_index]
             inc eax
             cmp ebx, eax
             jz finish_second

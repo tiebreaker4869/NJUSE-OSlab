@@ -58,6 +58,8 @@ _start:
 
     cmp eax, 0
 
+    call Big_Add
+
     ; jz ZERO_CASE
 
     ; call Big_Add

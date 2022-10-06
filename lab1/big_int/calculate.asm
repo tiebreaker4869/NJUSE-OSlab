@@ -25,6 +25,7 @@ section .bss
     expression: resb 100
     expression_len: resb 4
     operator_index: resb 4
+    operator_char: resb 1
 
 section .text
     global _start
@@ -41,6 +42,18 @@ _start:
     jz EXIT_NO_OPERATOR
 
     call GetOperands
+
+    mov ecx, operand1
+    mov edx, dword[operand1_len]
+    call CheckZero
+    mov ebx, eax
+
+    mov ecx, operand2
+    mov edx, dword[operand2_len]
+    call CheckZero
+    and eax, ebx
+
+    cmp eax, 0
 
     ; call Big_Add
 
@@ -80,10 +93,12 @@ GetOperator:
         jmp begin_loop
     find_add:
         mov dword[operator_index], ecx
+        mov byte[operator_char], ADD_OPERATOR
         mov eax, 0 ; find '+'
         ret
     find_mul:
         mov dword[operator_index], ecx
+        mov byte[operator_char], MUL_OPERATOR
         mov eax, 1 ; find '*'
         ret
     not_found:
@@ -180,4 +195,3 @@ ValidateDigit:
     cmp al, NINE_ASCII
     ja EXIT_OPERAND_NOT_VALID
     ret
-

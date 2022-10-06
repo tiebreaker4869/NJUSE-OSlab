@@ -122,7 +122,10 @@ GetOperands:
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
-            cmp ebx, expression + operator_index + 1
+            mov eax, expression
+            add eax, operator_index
+            inc eax
+            cmp ebx, eax
             jz finish_second
             dec ebx
             inc edx

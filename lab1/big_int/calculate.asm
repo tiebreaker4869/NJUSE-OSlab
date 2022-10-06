@@ -60,6 +60,12 @@ _start:
 
     call Big_Add
 
+    call Convert_To_Print_Format
+
+    mov ecx, result
+    mov edx, dword[result_len]
+    call DispStr
+
     ; jz ZERO_CASE
 
     ; call Big_Add
@@ -231,6 +237,7 @@ Big_Add:
         inc ecx
         mov byte[result+ecx], 1
     finish_add:
+        mov dword[result_len], ecx
         ret
 
 
@@ -247,3 +254,17 @@ Check_Out_Of_Bound: ; offset in ecx
         mov eax, 1
         ret
 
+Convert_To_Print_Format:
+    mov edx, result
+    mov ecx, 0
+    convert_loop:
+        mov bl, byte[edx]
+        add bl, ZERO_ASCII
+        mov byte[edx], bl
+        inc edx
+        inc ecx
+        cmp ecx, dword[result_len]
+        jz finish_convert
+        jmp convert_loop
+    finish_convert:
+        ret

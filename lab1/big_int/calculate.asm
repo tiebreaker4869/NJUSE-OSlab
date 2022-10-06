@@ -62,6 +62,8 @@ _start:
 
     call Convert_To_Print_Format
 
+    call Reverse_String
+
     mov ecx, result
     mov edx, dword[result_len]
     call DispStr
@@ -267,4 +269,20 @@ Convert_To_Print_Format:
         jz finish_convert
         jmp convert_loop
     finish_convert:
+        ret
+Reverse_String:
+    mov eax, dword[result_len]
+    sub eax, 1
+    mov ecx, 0
+    reverse_loop:
+        cmp eax, ecx
+        jna finish_reverse
+        mov dl, byte[result+eax]
+        mov bl, byte[result+ecx]
+        mov byte[result+eax], bl
+        mov byte[result+ecx], dl
+        inc ecx
+        dec eax
+        jmp reverse_loop
+    finish_reverse:
         ret

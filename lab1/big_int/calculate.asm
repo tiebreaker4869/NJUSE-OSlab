@@ -26,6 +26,9 @@ section .bss
     expression_len: resb 4
     operator_index: resb 4
     operator_char: resb 1
+    carry: resb 1
+    result: resb 100
+    result_len: resb 4
 
 section .text
     global _start
@@ -54,6 +57,8 @@ _start:
     and eax, ebx
 
     cmp eax, 0
+
+    ; jz ZERO_CASE
 
     ; call Big_Add
 
@@ -166,32 +171,71 @@ CheckZero: ; 操作数地址放在 ecx, 操作数长度放在 edx
     not_zero:
         mov eax, 1
         ret
-
-Big_Add:
-
-Big_Mul:
     
-
 EXIT:
     mov ebx, 0							; 参数一：退出代码
     mov eax, SYS_EXIT							; 系统调用号(sys_exit)
     int 0x80
 
-EXIT_NO_OPERATOR:
+EXIT_NO_OPERATOR: ; 操作符不合法
     mov ecx, NO_OPERATOR_MSG
     mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
     call DispStr
     jmp EXIT
 
-EXIT_OPERAND_NOT_VALID:
+EXIT_OPERAND_NOT_VALID: ; 操作数不合法
     mov ecx, OPERAND_NOT_VALID_MSG
     mov edx, OPERAND_NOT_VALID_MSG_END - OPERAND_NOT_VALID_MSG
     call DispStr
     jmp EXIT
 
-ValidateDigit:
+ValidateDigit: ; 检查每个数位是否是数字
     cmp al, ZERO_ASCII
     jb EXIT_OPERAND_NOT_VALID
     cmp al, NINE_ASCII
     ja EXIT_OPERAND_NOT_VALID
     ret
+
+Big_Add:
+    mov ecx, 0 ; offset
+    add_loop:
+        mov edx, operand1
+        add edx, ecx
+        mov ebx, byte[edx]
+        mov edx, operand2
+        add edx, ecx
+        mov edx, byte[edx]
+        add ebx, edx
+        mov edx, byte[carry]
+        add ebx, edx ; add carry
+        mov eax, ebx
+        div 10
+        mov byte[result+ecx], ah
+        mov byte[carry], al
+        inc ecx
+        call Check_Out_Of_Bound
+        cmp eax, 1
+        jz final_step
+        jmp add_loop
+    final_step:
+        cmp byte[carry], 0
+        jz finish_add
+        inc ecx
+        mov byte[result+ecx], 1
+    finish_add:
+        ret
+
+
+Check_Out_Of_Bound: ; offset in ecx
+    cmp dword[operand1_len], ecx
+    jb not_out_of_bound
+    cmp dword[operand2_len], ecx
+    jb not_out_of_bound
+    jmp out_of_bound 
+    not_out_of_bound:
+        mov eax, 0
+        ret
+    out_of_bound:
+        mov eax, 1
+        ret
+

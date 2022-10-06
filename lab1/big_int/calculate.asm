@@ -218,7 +218,6 @@ Big_Add:
         mov eax, edx
         mov edx, 0
         mov dl, byte[eax]
-        mov edx, eax
         add bl, dl
         mov dl, byte[carry]
         add bl, dl ; add carry

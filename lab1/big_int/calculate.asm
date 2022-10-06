@@ -203,12 +203,12 @@ Big_Add:
     add_loop:
         mov edx, operand1
         add edx, ecx
-        mov ebx, byte[edx]
+        mov bl, byte[edx]
         mov edx, operand2
         add edx, ecx
-        mov edx, byte[edx]
+        mov dl, byte[edx]
         add ebx, edx
-        mov edx, byte[carry]
+        mov dl, byte[carry]
         add ebx, edx ; add carry
         mov eax, ebx
         div 10

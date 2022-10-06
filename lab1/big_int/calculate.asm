@@ -104,7 +104,8 @@ GetOperands:
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
-            cmp expression, ebx
+            mov eax, expression
+            cmp eax, ebx
             jz finish_first
             dec ebx
             inc edx

@@ -211,7 +211,7 @@ Big_Add:
         mov dl, byte[carry]
         add ebx, edx ; add carry
         mov eax, ebx
-        mov bl 10
+        mov bl, 10
         div bl
         mov byte[result+ecx], ah
         mov byte[carry], al

@@ -47,7 +47,7 @@ _start:
 
         cmp eax, 1
 
-        jmp FINISH_CALCULATE
+        jz FINISH_CALCULATE
 
         call GetOperator
 
@@ -347,7 +347,7 @@ Check_Quit: ; check whether the user want to quit
     ret
     EXIT_CASE:
         mov eax, 1
-        ret 
+        ret
 
 Reset_All: ; reinit all data
     mov dword[operand1_len], 0

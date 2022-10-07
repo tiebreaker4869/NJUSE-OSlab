@@ -49,10 +49,14 @@ _start:
 
         jz FINISH_CALCULATE
 
+        mov eax, 0
+
         call GetOperator
 
         cmp eax, 2
         jz EXIT_NO_OPERATOR
+
+        mov eax, 0
 
         call GetOperands
 
@@ -389,6 +393,10 @@ Reset_All: ; reinit all data
         inc ecx
         jmp reset_res_loop
     finish_reset_res:
+        mov eax, 0
+        mov ebx, 0
+        mov ecx, 0
+        mov edx, 0
         ret
 
 Print_Result:

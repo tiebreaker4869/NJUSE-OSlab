@@ -341,7 +341,7 @@ Reverse_String: ; reverse result string
         ret
 
 Check_Quit: ; check whether the user want to quit
-    cmp byte[result], EXIT_QUERY
+    cmp byte[expression], EXIT_QUERY
     jz EXIT_CASE
     mov eax, 0
     ret

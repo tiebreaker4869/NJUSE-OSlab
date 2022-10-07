@@ -8,6 +8,7 @@
 %define MUL_OPERATOR 42
 %define ZERO_ASCII 48
 %define NINE_ASCII 57
+%define EXIT_QUERY 113
 
 section .data
     PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
@@ -248,6 +249,7 @@ Big_Mul:
         cmp ecx, dword[operand1_len]
         jz finish_outer_loop
         mov byte[carry], 0
+        mov edx, 0
         inner_loop:
             cmp edx, dword[operand2_len]
             jz finish_inner_loop
@@ -343,3 +345,55 @@ Reverse_String:
         jmp reverse_loop
     finish_reverse:
         ret
+
+Check_Quit:
+    cmp byte[result], EXIT_QUERY
+    jz EXIT_CASE
+    mov eax, 0
+    ret
+    EXIT_CASE:
+        mov eax, 1
+        ret 
+
+Reset_All:
+    mov dword[operand1_len], 0
+    mov dword[operand2_len], 0
+    mov dword[expression_len], 0
+    mov dword[operator_index], 0
+    mov byte[operator_char], 0
+    mov byte[carry], 0
+    mov dword[result_len], 0
+    mov ecx, 0
+    reset_operand1_loop:
+        cmp ecx, 42
+        jz finish_reset_operand1
+        mov byte[operand1+ecx], 0
+        inc ecx
+        jmp reset_operand1_loop
+    finish_reset_operand1:
+        mov ecx, 0
+    reset_operand2_loop:
+        cmp ecx, 42
+        jz finish_reset_operand2
+        mov byte[operand2+ecx], 0
+        inc ecx
+        jmp reset_operand2_loop
+    finish_reset_operand2:
+        mov ecx, 0
+    reset_expr_loop:
+        cmp ecx, 100
+        jz finish_reset_expr
+        mov byte[expression], 0
+        inc ecx
+        jmp reset_expr_loop
+    finish_reset_expr:
+        mov ecx, 0
+    reset_res_loop:
+        cmp ecx, 100
+        jz finish_reset_res
+        mov byte[result], 0
+        inc ecx
+        jmp reset_res_loop
+    finish_reset_res:
+        ret
+    

@@ -231,8 +231,8 @@ Big_Add:
         mov al, byte[carry]
         cmp eax, 0
         jz finish_add
-        inc ecx
         mov byte[result+ecx], 1
+        inc ecx
     finish_add:
         mov dword[result_len], ecx
         popad

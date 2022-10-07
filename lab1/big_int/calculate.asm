@@ -73,21 +73,26 @@ _start:
     
 
 DispStr:
+    call pushall
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)
 	mov eax, SYS_WRITE						; 系统调用号
-	int 0x80						; 陷入内核
+	int 0x80	
+    call popall					; 陷入内核
 	ret
 
 GetInput:
+    call pushall
     mov eax, SYS_READ ; 系统调用号
     mov ebx, STDIN ; 参数： 文件描述符
     mov ecx, expression ; 存储输入字符串的地址
     mov edx, MAX_LEN ; 最大长度
     int 80h ; 陷入内核
     mov dword[expression_len], eax
+    call popall
     ret
 
 GetOperator:
+    call pushall
     mov ebx, expression
     mov ecx, 0
     begin_loop:
@@ -105,17 +110,21 @@ GetOperator:
         mov dword[operator_index], ecx
         mov byte[operator_char], ADD_OPERATOR
         mov eax, 0 ; find '+'
+        call popall
         ret
     find_mul:
         mov dword[operator_index], ecx
         mov byte[operator_char], MUL_OPERATOR
         mov eax, 1 ; find '*'
+        call popall
         ret
     not_found:
         mov eax, 2 ; no operator
+        call popall
         ret
 
 GetOperands:
+    call pushall
     GetFirstOperand:
         mov ebx, expression
         add ebx, dword[operator_index]
@@ -158,24 +167,8 @@ GetOperands:
             jmp second_loop
         finish_second:
             mov dword[operand2_len], ecx
+    call popall
     ret
-
-CheckZero: ; 操作数地址放在 ecx, 操作数长度放在 edx
-    mov ebx, 0
-    check_loop:
-        cmp ebx, edx
-        jz is_zero
-        cmp byte[ecx], 0
-        jne not_zero
-        inc ebx
-        inc ecx
-        jmp check_loop
-    is_zero:
-        mov eax, 0
-        ret
-    not_zero:
-        mov eax, 1
-        ret
     
 EXIT:
     mov ebx, 0							; 参数一：退出代码
@@ -183,15 +176,19 @@ EXIT:
     int 0x80
 
 EXIT_NO_OPERATOR: ; 操作符不合法
+    call pushall
     mov ecx, NO_OPERATOR_MSG
     mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
     call DispStr
+    call popall
     jmp LOOP_START
 
 EXIT_OPERAND_NOT_VALID: ; 操作数不合法
+    call pushall
     mov ecx, OPERAND_NOT_VALID_MSG
     mov edx, OPERAND_NOT_VALID_MSG_END - OPERAND_NOT_VALID_MSG
     call DispStr
+    call popall
     jmp LOOP_START
     
 
@@ -203,6 +200,7 @@ ValidateDigit: ; 检查每个数位是否是数字
     ret
 
 Big_Add:
+    call pushall
     mov ecx, 0 ; offset
     add_loop:
         mov edx, operand1
@@ -235,9 +233,11 @@ Big_Add:
         mov byte[result+ecx], 1
     finish_add:
         mov dword[result_len], ecx
+        call popall
         ret
 
 Big_Mul:
+    call pushall
     mov ecx, 0 ; outer loop variable
     mov edx, 0 ; inner loop variable
     outer_loop:
@@ -296,10 +296,12 @@ Big_Mul:
                     jmp remove_loop
                 finish_remove:
                     mov dword[result_len], ecx
+            call popall
             ret
 
 
 Check_Out_Of_Bound: ; offset in ecx
+    call pushall
     cmp ecx, dword[operand1_len]
     jb not_out_of_bound
     cmp ecx, dword[operand2_len]
@@ -307,12 +309,15 @@ Check_Out_Of_Bound: ; offset in ecx
     jmp out_of_bound 
     not_out_of_bound:
         mov eax, 0
+        call popall
         ret
     out_of_bound:
         mov eax, 1
+        call popall
         ret
 
 Convert_To_Print_Format: ; convert result to printable format
+    pushall
     mov edx, result
     mov ecx, 0
     convert_loop:
@@ -345,12 +350,15 @@ Reverse_String: ; reverse result string
         ret
 
 Check_Quit: ; check whether the user want to quit
+    call pushall
     cmp byte[expression], EXIT_QUERY
     jz EXIT_CASE
     mov eax, 0
+    call popall
     ret
     EXIT_CASE:
         mov eax, 1
+        call popall
         ret
 
 Reset_All: ; reinit all data
@@ -400,6 +408,7 @@ Reset_All: ; reinit all data
         ret
 
 Print_Result:
+    call pushall
     call Convert_To_Print_Format
 
     call Reverse_String
@@ -407,9 +416,11 @@ Print_Result:
     mov ecx, result
     mov edx, dword[result_len]
     call DispStr
+    call popall
     ret
 
 Calculate:
+    call pushall
     cmp byte[operator_char], ADD_OPERATOR
     jz CALL_ADD
     cmp byte[operator_char], MUL_OPERATOR
@@ -417,7 +428,21 @@ Calculate:
     ret
     CALL_ADD:
         call Big_Add
+        call popall
         ret
     CALL_MUL:
         call Big_Mul
+        call popall
         ret
+
+pushall:
+    push ebx
+    push ecx
+    push edx
+    ret
+
+popall:
+    pop edx
+    pop ecx
+    pop ebx
+    ret

@@ -228,7 +228,8 @@ Big_Add:
         jz final_step
         jmp add_loop
     final_step:
-        cmp byte[carry], 0
+        mov eax, byte[carry]
+        cmp eax, 0
         jz finish_add
         inc ecx
         mov byte[result+ecx], 1

@@ -317,7 +317,7 @@ Check_Out_Of_Bound: ; offset in ecx
         ret
 
 Convert_To_Print_Format: ; convert result to printable format
-    pushall
+    call pushall
     mov edx, result
     mov ecx, 0
     convert_loop:

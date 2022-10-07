@@ -295,6 +295,8 @@ Big_Mul:
                     sub edx, 1
                     cmp byte[result+edx], 0
                     jne finish_remove
+                    cmp ecx, 1
+                    jz finish_remove
                     dec ecx
                     jmp remove_loop
                 finish_remove:
@@ -315,7 +317,7 @@ Check_Out_Of_Bound: ; offset in ecx
         mov eax, 1
         ret
 
-Convert_To_Print_Format:
+Convert_To_Print_Format: ; convert result to printable format
     mov edx, result
     mov ecx, 0
     convert_loop:
@@ -329,7 +331,7 @@ Convert_To_Print_Format:
         jmp convert_loop
     finish_convert:
         ret
-Reverse_String:
+Reverse_String: ; reverse result string
     mov eax, dword[result_len]
     sub eax, 1
     mov ecx, 0
@@ -346,7 +348,7 @@ Reverse_String:
     finish_reverse:
         ret
 
-Check_Quit:
+Check_Quit: ; check whether the user want to quit
     cmp byte[result], EXIT_QUERY
     jz EXIT_CASE
     mov eax, 0
@@ -355,7 +357,7 @@ Check_Quit:
         mov eax, 1
         ret 
 
-Reset_All:
+Reset_All: ; reinit all data
     mov dword[operand1_len], 0
     mov dword[operand2_len], 0
     mov dword[expression_len], 0
@@ -396,4 +398,3 @@ Reset_All:
         jmp reset_res_loop
     finish_reset_res:
         ret
-    

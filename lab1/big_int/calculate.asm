@@ -58,7 +58,7 @@ _start:
 
     cmp eax, 0
 
-    call Big_Add
+    call Big_Mul
 
     call Convert_To_Print_Format
 
@@ -240,6 +240,63 @@ Big_Add:
     finish_add:
         mov dword[result_len], ecx
         ret
+
+Big_Mul:
+    mov ecx, 0 ; outer loop variable
+    mov edx, 0 ; inner loop variable
+    outer_loop:
+        cmp ecx, dword[operand1_len]
+        jz finish_outer_loop
+        mov byte[carry], 0
+        inner_loop:
+            cmp edx, dword[operand2_len]
+            jz finish_inner_loop
+            mov ebx, ecx
+            add ebx, edx
+            mov eax, 0
+            mov al, byte[result+ebx]
+            mov ebx, 0
+            mov bl, byte[carry]
+            add al, bl
+            mov ebx, 0
+            mov bl, byte[operand1+ecx]
+            push eax
+            mov eax, 0
+            mov al, byte[operand2+edx]
+            mul bl
+            mov ebx, 0
+            mov ebx, eax
+            pop eax
+            add eax, ebx
+            mov ebx, 0
+            mov bl, 10
+            div bl
+            mov ebx, ecx
+            add ebx, edx
+            mov byte[result+ebx], ah
+            mov byte[carry], al
+            inc edx
+            jmp inner_loop
+        finish_inner_loop:
+            mov ebx, dword[operand2_len]
+            add ebx, ecx
+            mov eax, 0
+            mov al, byte[carry]
+            mov byte[result+ebx], al
+            inc ecx
+            jmp outer_loop
+        finish_outer_loop:
+            add ecx, edx
+            remove_lead_zero:
+                remove_loop:
+                    mov edx, ecx
+                    sub edx, 1
+                    cmp byte[result+edx], 0
+                    jne finish_remove
+                    dec ecx
+                finish_remove:
+                    mov dword[result_len], ecx
+            ret
 
 
 Check_Out_Of_Bound: ; offset in ecx

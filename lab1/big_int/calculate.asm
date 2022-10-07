@@ -279,7 +279,7 @@ Big_Mul:
             jmp inner_loop
         finish_inner_loop:
             mov ebx, dword[operand2_len]
-            add ebx, ecx
+            add ebx, ecx ; ebx := i + operand2_len
             mov eax, 0
             mov al, byte[carry]
             mov byte[result+ebx], al
@@ -294,6 +294,7 @@ Big_Mul:
                     cmp byte[result+edx], 0
                     jne finish_remove
                     dec ecx
+                    jmp remove_loop
                 finish_remove:
                     mov dword[result_len], ecx
             ret

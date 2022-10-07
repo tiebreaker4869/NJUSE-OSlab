@@ -11,7 +11,7 @@
 %define EXIT_QUERY 113
 
 section .data
-    PromptMessage: db "Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
+    PromptMessage: db 0ah,"Please enter expression (x+y or x*y, without blankspace in the middle): ", 0ah ; 提示用户消息
     PromptMessageEnd:
     NO_OPERATOR_MSG: db "Invalid expression: No valid operator found.", 0ah
     NO_OPERATOR_MSG_END:
@@ -34,46 +34,36 @@ section .bss
 section .text
     global _start
 _start:
-    mov ecx, PromptMessage ; 提示字符串地址
-    mov edx, PromptMessageEnd - PromptMessage ; 提示字符串长度
-    call DispStr
+    LOOP_START:
+        mov ecx, PromptMessage ; 提示字符串地址
+        mov edx, PromptMessageEnd - PromptMessage ; 提示字符串长度
+        call DispStr
 
-    call GetInput
+        call Reset_All
 
-    call GetOperator
+        call GetInput
 
-    cmp eax, 2
-    jz EXIT_NO_OPERATOR
+        call Check_Quit
 
-    call GetOperands
+        cmp eax, 1
 
-    mov ecx, operand1
-    mov edx, dword[operand1_len]
-    call CheckZero
-    mov ebx, eax
+        jmp FINISH_CALCULATE
 
-    mov ecx, operand2
-    mov edx, dword[operand2_len]
-    call CheckZero
-    and eax, ebx
+        call GetOperator
 
-    cmp eax, 0
+        cmp eax, 2
+        jz EXIT_NO_OPERATOR
 
-    call Big_Mul
+        call GetOperands
 
-    call Convert_To_Print_Format
+        call Calculate
 
-    call Reverse_String
+        call Print_Result
 
-    mov ecx, result
-    mov edx, dword[result_len]
-    call DispStr
+        jmp LOOP_START
 
-    ; jz ZERO_CASE
+    FINISH_CALCULATE:
 
-    ; call Big_Add
-
-    ; call Big_Mul
 
     jmp EXIT; 退出程序
     
@@ -192,13 +182,14 @@ EXIT_NO_OPERATOR: ; 操作符不合法
     mov ecx, NO_OPERATOR_MSG
     mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
     call DispStr
-    jmp EXIT
+    jmp LOOP_START
 
 EXIT_OPERAND_NOT_VALID: ; 操作数不合法
     mov ecx, OPERAND_NOT_VALID_MSG
     mov edx, OPERAND_NOT_VALID_MSG_END - OPERAND_NOT_VALID_MSG
     call DispStr
-    jmp EXIT
+    jmp LOOP_START
+    
 
 ValidateDigit: ; 检查每个数位是否是数字
     cmp al, ZERO_ASCII
@@ -331,6 +322,7 @@ Convert_To_Print_Format: ; convert result to printable format
         jmp convert_loop
     finish_convert:
         ret
+
 Reverse_String: ; reverse result string
     mov eax, dword[result_len]
     sub eax, 1
@@ -397,4 +389,27 @@ Reset_All: ; reinit all data
         inc ecx
         jmp reset_res_loop
     finish_reset_res:
+        ret
+
+Print_Result:
+    call Convert_To_Print_Format
+
+    call Reverse_String
+
+    mov ecx, result
+    mov edx, dword[result_len]
+    call DispStr
+    ret
+
+Calculate:
+    cmp byte[operator_char], ADD_OPERATOR
+    jz CALL_ADD
+    cmp byte[operator_char], MUL_OPERATOR
+    jz CALL_MUL
+    ret
+    CALL_ADD:
+        call Big_Add
+        ret
+    CALL_MUL:
+        call Big_Mul
         ret

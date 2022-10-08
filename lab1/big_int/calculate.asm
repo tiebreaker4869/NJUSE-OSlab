@@ -394,7 +394,7 @@ Reset_All: ; reinit all data
     reset_expr_loop:
         cmp ecx, 100
         jz finish_reset_expr
-        mov byte[expression], 0
+        mov byte[expression+ecx], 0
         inc ecx
         jmp reset_expr_loop
     finish_reset_expr:
@@ -402,7 +402,7 @@ Reset_All: ; reinit all data
     reset_res_loop:
         cmp ecx, 100
         jz finish_reset_res
-        mov byte[result], 0
+        mov byte[result+ecx], 0
         inc ecx
         jmp reset_res_loop
     finish_reset_res:

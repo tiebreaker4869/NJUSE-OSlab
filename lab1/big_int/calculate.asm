@@ -25,7 +25,7 @@ section .bss
     operand2_len: resb 4
     expression: resb 100
     expression_len: resb 4
-    operator_index: resb 4
+    operator_index: resb 4 ; 操作符在表达式中的下标
     operator_char: resb 1
     carry: resb 1
     result: resb 100
@@ -46,24 +46,24 @@ _start:
 
         call Check_Quit
 
-        cmp eax, 1
+        cmp eax, 1      ; 检查是否需要退出，需要退出的话 Check_Quit 返回的是 1
 
         jz FINISH_CALCULATE
 
         mov eax, 0
 
-        call GetOperator
+        call GetOperator    ; 从表达式中抽取操作符
 
-        cmp eax, 2
+        cmp eax, 2          ; 检查是否找不到合法的操作符，找不到的话 GetOperator 返回的是 2
         jz EXIT_NO_OPERATOR
 
         mov eax, 0
 
-        call GetOperands
+        call GetOperands     ; 从表达式中抽取出操作数, 按从低到高排列每个十进制位
 
-        call Calculate
+        call Calculate       ; 调用 Big_Add 或者 Big_Mul
 
-        call Print_Result
+        call Print_Result   ; 打印结果
 
         jmp LOOP_START
 
@@ -76,26 +76,26 @@ _start:
 DispStr:
     pushad
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)
-	mov eax, SYS_WRITE						; 系统调用号
+	mov eax, SYS_WRITE					; sys write 的系统调用号
 	int 0x80	
-    popad					; 陷入内核
+    popa
 	ret
 
 GetInput:
     pushad
-    mov eax, SYS_READ ; 系统调用号
-    mov ebx, STDIN ; 参数： 文件描述符
-    mov ecx, expression ; 存储输入字符串的地址
-    mov edx, MAX_LEN ; 最大长度
-    int 80h ; 陷入内核
-    mov dword[expression_len], eax
+    mov eax, SYS_READ           ; sys read 的系统调用号
+    mov ebx, STDIN              ; 参数： 文件描述符
+    mov ecx, expression         ; 存储输入字符串的地址
+    mov edx, MAX_LEN            ; 最大长度
+    int 80h
+    mov dword[expression_len], eax ; eax 里面是读入的表达式的实际长度（包含末尾的 '\0')
     popad
     ret
 
 GetOperator:
     pushad
-    mov ebx, expression
-    mov ecx, 0
+    mov ebx, expression         ; ebx 里面存 expression 的首地址
+    mov ecx, 0                  ; ecx 里面存偏移
     begin_loop:
         mov edx, ecx
         add edx, expression
@@ -127,20 +127,20 @@ GetOperator:
 GetOperands:
     pushad
     GetFirstOperand:
-        mov ebx, expression
-        add ebx, dword[operator_index]
-        sub ebx, 1
-        mov edx, operand1
+        mov ebx, expression             ; ebx 里面存 expression 首地址
+        add ebx, dword[operator_index]  
+        sub ebx, 1                      ; 得到expression 中 operand1 最后一位地址
+        mov edx, operand1               
         mov ecx, 0
-        first_loop:
+        first_loop:                     ; 从 operand1 最后一位开始往前扫
             mov al, byte[ebx]
-            call ValidateDigit ; 检查该位是不是数字
+            call ValidateDigit          ; 检查该位是不是数字
             sub al, ZERO_ASCII
             mov byte[edx], al
             inc ecx
-            mov eax, expression
-            cmp eax, ebx
-            jz finish_first
+            mov eax, expression         
+            cmp eax, ebx                ; 检查是否扫完 operand1 部分
+            jz finish_first             
             dec ebx
             inc edx
             jmp first_loop
@@ -172,11 +172,11 @@ GetOperands:
     ret
     
 EXIT:
-    mov ebx, 0							; 参数一：退出代码
+    mov ebx, 0							        ; 参数一：退出代码
     mov eax, SYS_EXIT							; 系统调用号(sys_exit)
     int 0x80
 
-EXIT_NO_OPERATOR: ; 操作符不合法
+EXIT_NO_OPERATOR:                               ; 操作符不合法
     pushad
     mov ecx, NO_OPERATOR_MSG
     mov edx, NO_OPERATOR_MSG_END - NO_OPERATOR_MSG
@@ -184,7 +184,7 @@ EXIT_NO_OPERATOR: ; 操作符不合法
     popad
     jmp LOOP_START
 
-EXIT_OPERAND_NOT_VALID: ; 操作数不合法
+EXIT_OPERAND_NOT_VALID:                         ; 操作数不合法
     pushad
     mov ecx, OPERAND_NOT_VALID_MSG
     mov edx, OPERAND_NOT_VALID_MSG_END - OPERAND_NOT_VALID_MSG
@@ -193,7 +193,7 @@ EXIT_OPERAND_NOT_VALID: ; 操作数不合法
     jmp LOOP_START
     
 
-ValidateDigit: ; 检查每个数位是否是数字
+ValidateDigit:                                  ; 检查每个数位是否是数字
     cmp al, ZERO_ASCII
     jb EXIT_OPERAND_NOT_VALID
     cmp al, NINE_ASCII
@@ -202,26 +202,26 @@ ValidateDigit: ; 检查每个数位是否是数字
 
 Big_Add:
     pushad
-    mov ecx, 0 ; offset
+    mov ecx, 0              ; ecx 存的是当前在算结果的第几位
     add_loop:
         mov edx, operand1
         add edx, ecx
         mov ebx, 0
-        mov bl, byte[edx]
+        mov bl, byte[edx]   ; bl := operand1[ecx]
         mov edx, operand2
         add edx, ecx
         mov eax, edx
         mov edx, 0
-        mov dl, byte[eax]
+        mov dl, byte[eax]   ; dl := operand2[ecx]
         add bl, dl
         mov dl, byte[carry]
-        add bl, dl ; add carry
+        add bl, dl          ; add carry
         mov eax, ebx
         mov ebx, 0
-        mov bl, 10
+        mov bl, 10         
         div bl
-        mov byte[result+ecx], ah
-        mov byte[carry], al
+        mov byte[result+ecx], ah ; ah 存的是除法的余数，也就是本位结果
+        mov byte[carry], al      ; al 存的是除法的商，也就是 carry
         inc ecx
         call Check_Out_Of_Bound
         cmp eax, 1
@@ -231,10 +231,10 @@ Big_Add:
         mov al, byte[carry]
         cmp eax, 0
         jz finish_add
-        mov byte[result+ecx], 1
+        mov byte[result+ecx], 1  ; 有进位需要处理
         inc ecx
     finish_add:
-        mov dword[result_len], ecx
+        mov dword[result_len], ecx ; 保存结果的位数
         popad
         ret
 
@@ -253,10 +253,10 @@ Big_Mul:
             mov ebx, ecx
             add ebx, edx
             mov eax, 0
-            mov al, byte[result+ebx]
+            mov al, byte[result+ebx]   ; al := result[ecx+edx]
             mov ebx, 0
             mov bl, byte[carry]
-            add al, bl
+            add al, bl                  ; result[ecx+edx] += carry
             mov ebx, 0
             mov bl, byte[operand1+ecx]
             push eax
@@ -266,27 +266,27 @@ Big_Mul:
             mov ebx, 0
             mov ebx, eax
             pop eax
-            add eax, ebx
+            add eax, ebx                ; result[ecx+edx] += operand1[ecx] * operand2[edx]
             mov ebx, 0
             mov bl, 10
             div bl
             mov ebx, ecx
             add ebx, edx
-            mov byte[result+ebx], ah
-            mov byte[carry], al
+            mov byte[result+ebx], ah    ; result[ecx+edx] %= 10
+            mov byte[carry], al         ; carry := result[ecx+edx] / 10
             inc edx
             jmp inner_loop
         finish_inner_loop:
             mov ebx, dword[operand2_len]
-            add ebx, ecx ; ebx := i + operand2_len
+            add ebx, ecx
             mov eax, 0
             mov al, byte[carry]
-            mov byte[result+ebx], al
+            mov byte[result+ebx], al    ; result[ecx+operand2_len] = carry
             inc ecx
             jmp outer_loop
         finish_outer_loop:
             add ecx, edx
-            remove_lead_zero:
+            remove_lead_zero:            ; 去除前导零
                 remove_loop:
                     mov edx, ecx
                     sub edx, 1
@@ -297,12 +297,12 @@ Big_Mul:
                     dec ecx
                     jmp remove_loop
                 finish_remove:
-                    mov dword[result_len], ecx
+                    mov dword[result_len], ecx ; 保存结果长度
             popad
             ret
 
 
-Check_Out_Of_Bound: ; offset in ecx
+Check_Out_Of_Bound:              ;检查是否越界，下标存在 ecx 里面
     pushad
     cmp ecx, dword[operand1_len]
     jb not_out_of_bound
@@ -318,7 +318,7 @@ Check_Out_Of_Bound: ; offset in ecx
         mov eax, 1
         ret
 
-Convert_To_Print_Format: ; convert result to printable format
+Convert_To_Print_Format:            ; 把结果转换成可以打印的形式，每位加上 0 的 ASCII
     pushad
     mov edx, result
     mov ecx, 0
@@ -335,7 +335,7 @@ Convert_To_Print_Format: ; convert result to printable format
         popad
         ret
 
-Reverse_String: ; reverse result string
+Reverse_String:                 ; 反转结果字符串，双指针法
     pushad
     mov eax, dword[result_len]
     sub eax, 1
@@ -354,7 +354,7 @@ Reverse_String: ; reverse result string
         popad
         ret
 
-Check_Quit: ; check whether the user want to quit
+Check_Quit:                             ; 如果用户输入 q 就退出
     pushad
     cmp byte[expression], EXIT_QUERY
     jz EXIT_CASE
@@ -366,7 +366,7 @@ Check_Quit: ; check whether the user want to quit
         mov eax, 1
         ret
 
-Reset_All: ; reinit all data
+Reset_All:                          ; 重置所有 bss 区的变量和寄存器
     mov dword[operand1_len], 0
     mov dword[operand2_len], 0
     mov dword[expression_len], 0
@@ -412,19 +412,19 @@ Reset_All: ; reinit all data
         mov edx, 0
         ret
 
-Print_Result:
-    pushad
+Print_Result:                       ; 计算之后 result 里面每个字节存储该位的十进制计算结果，从低位到高位
+    pushad                          ; 把 result 中存的计算结果转换成打印的形式（ASCII）并反转
     call Convert_To_Print_Format
 
     call Reverse_String
 
-    mov ecx, result
-    mov edx, dword[result_len]
+    mov ecx, result                 ; 打印的字符串地址
+    mov edx, dword[result_len]      ; 字符串长度
     call DispStr
     popad
     ret
 
-Calculate:
+Calculate:                                  ; 根据运算符决定调用加法或者乘法
     pushad
     cmp byte[operator_char], ADD_OPERATOR
     jz CALL_ADD

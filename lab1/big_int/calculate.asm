@@ -78,7 +78,7 @@ DispStr:
     mov ebx, STDOUT    					; 参数：文件描述符(stdout)
 	mov eax, SYS_WRITE					; sys write 的系统调用号
 	int 0x80	
-    popa
+    popad
 	ret
 
 GetInput:

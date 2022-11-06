@@ -58,6 +58,10 @@ class RootDirEntry {
     uint32_t getFileSize();
 
     uint16_t getFirstCluster();
+
+    void fillFileContent(FILE* fat12, uint16_t cluster_number, FileNode* file);
+
+    void readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNode* root_node);
 };
 
 // Boot Record 数据部分数据结构
@@ -95,6 +99,10 @@ class FileNode {
     int file_count = 0;
     char* content = new char[10000];
 
+    FileNode(){}
+
+    FileNode(string name, string path, bool is_file, uint32_t file_size);
+
     void setPath(string path){
         this->path = path;
     }
@@ -102,6 +110,12 @@ class FileNode {
     void setName(string name){
         this->name = name;
     }
+
+    string getPath(){return path;}
+
+    void addFileChildNode(FileNode* child);
+
+    void addDirChildNode(FileNode* child);
 };
 
 void BPB::initialize(FILE* fat12){
@@ -134,21 +148,29 @@ void BPB::initialize(FILE* fat12){
 
 void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
     int cur_addr = root_base_addr;
+    char name[12];
 
     for(int i = 0; i < root_entry_count; i ++){
+        // 依次读取每个根目录区表项
         fseek(fat12, cur_addr, SEEK_SET);
         fread(this, 1, 32, fat12);
 
         cur_addr += 32;
 
-        if(this->isEmptyName() || this->isInvalidName()){
-            continue;
-        }
-
-        if(this->isFile()){
-
-        }else {
-            
+        if(!this->isEmptyName() && !this->isInvalidName()){
+            if(this->isFile()){
+                this->makeFileName(name);
+                FileNode* child = new FileNode(name, root->getPath(), this->isFile(), this->file_size);
+                root->addFileChildNode(child);
+                this->fillFileContent(fat12, this->getFirstCluster(), child);
+            }else {
+                this->makeDirName(name);
+                FileNode* child = new FileNode();
+                child->setName(name);
+                child->setPath(root->getPath() + name + "/");
+                root->addDirChildNode(child);
+                this->readChildrenNode(fat12, this->getFirstCluster(), child);
+            }
         }
     }
 }

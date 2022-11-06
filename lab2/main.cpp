@@ -410,7 +410,22 @@ void FileNode::addDirChildNode(FileNode* child){
     this->directory_count ++;
 }
 
+// 检查参数, -l, -ll 为正确的形式, -L, -al 等都是错的
+bool is_l_params(const string &s){
+    if(s[0] != '-'){
+        return false;
+    }else {
+        int len = s.size();
 
+        for(int i = 1; i < len; i ++){
+            if(s[i] != 'l'){
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 // handle cmd case: ls
 void handle_ls(FileNode* root){
@@ -447,6 +462,10 @@ void handle_ls(FileNode* root){
             handle_ls(sub[i]);
         }
     }
+}
+
+void handle_ls_l(FileNode* root){
+
 }
 
 void handle_ls_cmd(vector<string> cmds, FileNode* root){

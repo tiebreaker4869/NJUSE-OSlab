@@ -268,7 +268,38 @@ void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNod
 
     int next_cluster = 0;
 
+    char* ptr = file->getContent();
 
+    if(cluster_number == 0){
+        return;
+    }
+
+    while(next_cluster < 0xFF8){
+        next_cluster = getFATEntry(fat12, current_cluster);
+
+        // 值为 0xFF7 说明是一个坏簇
+        if(next_cluster == 0xFF7){
+            char* error_message = "error in fillFileContent: Something wrong with the file!";
+            my_print_default(error_message, strlen(error_message));
+            break;
+        }
+
+        char* content = new char[byte_per_cluster];
+        // 数据区从簇 2 开始
+        int cluster_start_byte = base + (current_cluster - 2) * byte_per_cluster;
+
+        fseek(fat12, cluster_start_byte, SEEK_SET);
+        fread(content, 1, byte_per_cluster, fat12);
+
+        for(int i = 0; i < byte_per_cluster; i ++){
+            *ptr = content[i];
+            ptr ++;
+        }
+
+        delete[] content;
+
+        current_cluster = next_cluster;
+    }
 }
 
 void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNode* root_node){

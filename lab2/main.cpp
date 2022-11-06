@@ -43,7 +43,7 @@ class RootDirEntry {
 
     RootDirEntry(){}
 
-    void initRootDir(FILE* fat12, FileNode* root);
+    void initRootDirArea(FILE* fat12, FileNode* root);
 
     bool isEmptyName();
 
@@ -132,6 +132,27 @@ void BPB::initialize(FILE* fat12){
 
 }
 
+void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
+    int cur_addr = root_base_addr;
+
+    for(int i = 0; i < root_entry_count; i ++){
+        fseek(fat12, cur_addr, SEEK_SET);
+        fread(this, 1, 32, fat12);
+
+        cur_addr += 32;
+
+        if(this->isEmptyName() || this->isInvalidName()){
+            continue;
+        }
+
+        if(this->isFile()){
+
+        }else {
+            
+        }
+    }
+}
+
 int main(){
 
     char* fat_path = "";
@@ -145,7 +166,7 @@ int main(){
     rootNode->setName("");
 
     RootDirEntry* rootEntry = new RootDirEntry();
-    rootEntry->initRootDir(fat12, rootNode);
+    rootEntry->initRootDirArea(fat12, rootNode);
 
     char* cmd = new char[128];
 

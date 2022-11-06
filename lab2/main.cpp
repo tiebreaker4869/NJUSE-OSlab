@@ -209,6 +209,31 @@ bool RootDirEntry::isFile(){
     return (bits & 0x10) == 0;
 }
 
+uint32_t RootDirEntry::getFileSize(){
+    return this->file_size;
+}
+
+uint16_t RootDirEntry::getFirstCluster(){
+    return this->cluster_number;
+}
+
+void RootDirEntry::makeFileName(char* name){
+
+    for(int i = 0; i < 11; i ++){
+        name[i] = this->filename[i];
+    }
+
+    name[11] = '\0';
+}
+
+void RootDirEntry::makeDirName(char* name){
+    for(int i = 0; i < 11; i ++){
+        name[i] = this->filename[i];
+    }
+
+    name[11] = '\0';
+}
+
 int main(){
 
     char* fat_path = "";

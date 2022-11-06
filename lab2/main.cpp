@@ -7,8 +7,8 @@
 using namespace std;
 
 // extern function from nasm
-void my_print_red(char* str, int length);
-void my_print_default(char* str, int length);
+void my_print_red(const char* str, int length);
+void my_print_default(const char* str, int length);
 
 // 全局变量
 
@@ -93,9 +93,9 @@ class FileNode {
     string name;
     vector<FileNode*> next;
     string path;
-    uint32_t fileSize;
-    bool isFile = false;;
-    bool isValid = true;
+    uint32_t file_size;
+    bool is_file = false;;
+    bool isValid = true; // "." 和 ".." 属于 invalid 的 filenode
     int directory_count = 0;
     int file_count = 0;
     char* content = new char[10000];
@@ -103,6 +103,8 @@ class FileNode {
     FileNode(){}
 
     FileNode(string name, string path, bool is_file, uint32_t file_size);
+
+    FileNode(string name, bool isValid);
 
     void setPath(string path){
         this->path = path;
@@ -113,6 +115,8 @@ class FileNode {
     }
 
     string getPath(){return path;}
+
+    string getName(){return name;}
 
     char* getContent();
 
@@ -313,8 +317,10 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
     while(next_cluster < 0xFF8){
         next_cluster = getFATEntry(fat12, current_cluster);
         if(next_cluster == 0xFF7){
+            // 0xFF7 表示坏簇
             char* error_message = "error in readChildrenNode: bad cluster, something wrong in the file.";
             my_print_default(error_message, strlen(error_message));
+            break;
         }
 
         int cluster_start_byte = base + (current_cluster - 2) * byte_per_cluster;
@@ -349,9 +355,114 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
             }
         }
 
+        // 这个其实不需要，因为目录项只有 32 bytes
         current_cluster = next_cluster;
     }
 }
+
+vector<string> tokenize(const string &str, const string &deliminator){
+    vector<string> res;
+
+    if(str == ""){
+        return res;
+    }
+
+    char* s = new char[str.size() + 1];
+    unique_ptr<char> ptr = make_unique<char>(s);
+    strcpy(ptr.get(), str.c_str());
+
+    char* delim = new char[deliminator.size() + 1];
+    unique_ptr<char> dptr = make_unique<char>(delim);
+    strcpy(dptr.get(), deliminator.c_str());
+
+    char* p = strtok(ptr.get(), dptr.get());
+
+    while(p){
+        string token = p;
+        res.push_back(token);
+        p = strtok(NULL, dptr.get());
+    }
+
+    return res;
+}
+
+FileNode::FileNode(string name, bool isValid){
+    this->name = name;
+    this->isValid = isValid;
+}
+
+FileNode::FileNode(string name, string path, bool is_file, uint32_t file_size){
+    this->name = name;
+    this->path = path;
+    this->is_file = is_file; 
+    this->file_size = file_size;
+}
+
+void FileNode::addFileChildNode(FileNode* child){
+    this->next.push_back(child);
+    this->file_count ++;
+}
+
+void FileNode::addDirChildNode(FileNode* child){
+    this->next.push_back(new FileNode(".", false));
+    this->next.push_back(new FileNode("..", false));
+    this->next.push_back(child);
+    this->directory_count ++;
+}
+
+
+
+// handle cmd case: ls
+void handle_ls(FileNode* root){
+    if(root->is_file){
+        return;
+    }
+
+    string path = root->getPath() + ":\n";
+
+    const char* path_str = path.c_str();
+
+    my_print_default(path_str, strlen(path_str));
+
+    vector<FileNode*> sub = root->next;
+
+    int len = sub.size();
+
+    for(int i = 0; i < len; i ++){
+        if(sub[i]->is_file){
+            string name = sub[i]->getName() + " ";
+            const char* name_str = name.c_str();
+            my_print_default(name_str, strlen(name_str));
+        }else {
+            string name = sub[i]->getName() + " ";
+            const char* name_str = name.c_str();
+            my_print_red(name_str, strlen(name_str));
+        }
+    }
+
+    my_print_default("\n", 1);
+
+    for(int i = 0; i < len; i ++){
+        if(sub[i]->isValid){
+            handle_ls(sub[i]);
+        }
+    }
+}
+
+void handle_ls_cmd(vector<string> cmds, FileNode* root){
+    // 处理 ls 不带参数的情况
+    if(cmds.size() == 1){
+        handle_ls(root);
+    }
+
+
+}
+
+void handle_cat_cmd(vector<string> cmds, FileNode* root){
+
+}
+
+
 
 int main(){
 
@@ -366,24 +477,30 @@ int main(){
     rootNode->setName("");
 
     RootDirEntry* rootEntry = new RootDirEntry();
-    rootEntry->initRootDirArea(fat12, rootNode);
-
-    char* cmd = new char[128];
+    rootEntry->initRootDirArea(fat12, rootNode); 
 
     while(true){
-        // print prompt char
-        //my_print_default(">", 1);
-        putchar('>');
+        my_print_default(">", 1);
 
-        // read command
-        cin.getline(cmd, 128);
+        string cmd;
+        getline(cin, cmd);
 
-        // quit if user type 'exit'
-        if(strcmp(cmd, "exit") == 0){
+        vector<string> cmds = tokenize(cmd, " ");
+
+        if(cmds[0] == "exit"){
+            // 用户输入 exit，关闭文件并退出
+            fclose(fat12);
+            char* exit_msg = "exit";
+            my_print_default(exit_msg, strlen(exit_msg));
             break;
+        }else if(cmds[0] == "cat"){
+            handle_cat_cmd(cmds, rootNode);
+        }else if(cmds[0] == "ls"){
+            handle_ls_cmd(cmds, rootNode);
+        }else {
+            char* unknown_cmd = "Unknown command!";
+            my_print_default(unknown_cmd, strlen(unknown_cmd));
         }
-
-        
     }
 
     return 0;

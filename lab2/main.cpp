@@ -468,12 +468,33 @@ void handle_ls_l(FileNode* root){
 
 }
 
+// 检查形如 -[config] 的 token 是否满足 l 的要求
+bool check_params_l(vector<string> cmds){
+    int len = cmds.size();
+
+    for(int i = 1; i < len; i ++){
+        if(cmds[i][0] == '-'){
+            if(!is_l_params(cmds[i]))return false;
+        }
+    }
+
+    return true;
+}
+
 void handle_ls_cmd(vector<string> cmds, FileNode* root){
     // 处理 ls 不带参数的情况
     if(cmds.size() == 1){
         handle_ls(root);
     }
 
+    int len = cmds.size();
+
+    if(!check_params_l(cmds)){
+        char* error_msg = "Invalid params!\n";
+        my_print_default(error_msg, strlen(error_msg));
+    }
+
+    
 
 }
 

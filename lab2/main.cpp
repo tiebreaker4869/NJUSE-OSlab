@@ -113,6 +113,8 @@ class FileNode {
 
     string getPath(){return path;}
 
+    char* getContent();
+
     void addFileChildNode(FileNode* child);
 
     void addDirChildNode(FileNode* child);
@@ -217,6 +219,10 @@ uint16_t RootDirEntry::getFirstCluster(){
     return this->cluster_number;
 }
 
+char* FileNode::getContent(){
+    return this->content;
+}
+
 void RootDirEntry::makeFileName(char* name){
 
     for(int i = 0; i < 11; i ++){
@@ -232,6 +238,41 @@ void RootDirEntry::makeDirName(char* name){
     }
 
     name[11] = '\0';
+}
+
+// 获取 FAT 第 index 个表项的值
+int getFATEntry(FILE* fat12, int index){
+    int base = fat_base_addr;
+    int fat_entry_addr = base + index * 3 / 2;
+
+    int type = index % 2;
+
+    uint16_t fat_value;
+    uint16_t* ptr = &fat_value;
+    fseek(fat12, fat_entry_addr, SEEK_SET);
+    fread(ptr, 1, 2, fat12);
+
+    if(type == 0){
+        fat_value = fat_value << 4;
+    }
+
+    fat_value >>= 4;
+
+    return fat_value;
+}
+
+void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNode* file){
+    int base = data_base_addr;
+
+    int current_cluster = cluster_number;
+
+    int next_cluster = 0;
+
+
+}
+
+void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNode* root_node){
+
 }
 
 int main(){

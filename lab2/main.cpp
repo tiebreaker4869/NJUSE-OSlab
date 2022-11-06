@@ -175,6 +175,34 @@ void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
     }
 }
 
+bool RootDirEntry::isEmptyName(){
+    return this->filename[0] == '\0';
+}
+
+bool isCapitalAlphaOrDigit(char c){
+    if(c >= '0' && c <= '9'){
+        return true;
+    }
+
+    if(c >= 'A' && c <= 'Z'){
+        return true;
+    }
+
+    return false;
+}
+
+bool RootDirEntry::isInvalidName(){
+
+    for(int i = 0; i < 11; i ++){
+        char c = this->filename[i];
+        if(!isCapitalAlphaOrDigit(c)){
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int main(){
 
     char* fat_path = "";

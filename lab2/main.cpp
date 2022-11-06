@@ -203,6 +203,12 @@ bool RootDirEntry::isInvalidName(){
     return false;
 }
 
+bool RootDirEntry::isFile(){
+    uint8_t bits = this->attribute;
+
+    return (bits & 0x10) == 0;
+}
+
 int main(){
 
     char* fat_path = "";

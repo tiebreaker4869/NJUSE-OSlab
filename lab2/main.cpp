@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cstdio>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -279,7 +280,7 @@ void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNod
 
         // 值为 0xFF7 说明是一个坏簇
         if(next_cluster == 0xFF7){
-            char* error_message = "error in fillFileContent: Something wrong with the file!";
+            char* error_message = "error in fillFileContent: bad cluster, Something wrong with the file!";
             my_print_default(error_message, strlen(error_message));
             break;
         }
@@ -303,7 +304,53 @@ void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNod
 }
 
 void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNode* root_node){
+    int base = data_base_addr;
 
+    int current_cluster = cluster_number;
+
+    int next_cluster = 0;
+
+    while(next_cluster < 0xFF8){
+        next_cluster = getFATEntry(fat12, current_cluster);
+        if(next_cluster == 0xFF7){
+            char* error_message = "error in readChildrenNode: bad cluster, something wrong in the file.";
+            my_print_default(error_message, strlen(error_message));
+        }
+
+        int cluster_start_byte = base + (current_cluster - 2) * byte_per_cluster;
+
+        int current_byte = 0;
+
+        while(current_byte < byte_per_cluster){
+            unique_ptr<RootDirEntry> rootEntry = make_unique<RootDirEntry>();
+            fseek(fat12, cluster_start_byte, SEEK_SET);
+            fread(rootEntry.get(), 1, 32, fat12);
+
+            current_byte += 32;
+
+            if(rootEntry->isEmptyName() || rootEntry->isInvalidName()){
+                continue;
+            }
+
+            char name[12];
+
+            if(rootEntry->isFile()){
+                rootEntry->makeFileName(name);
+                FileNode* child = new FileNode(name, root_node->getPath(), true, rootEntry->getFileSize());
+                root_node->addFileChildNode(child);
+                this->fillFileContent(fat12, rootEntry->getFirstCluster(), child);
+            }else {
+                rootEntry->makeDirName(name);
+                FileNode* child = new FileNode();
+                child->setName(name);
+                child->setPath(root_node->getPath() + name + "/");
+                root_node->addDirChildNode(child);
+                this->readChildrenNode(fat12, rootEntry->getFirstCluster(), child);
+            }
+        }
+
+        current_cluster = next_cluster;
+    }
 }
 
 int main(){

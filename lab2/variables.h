@@ -1,3 +1,4 @@
+#pragma once
 // 全局变量
 
 int byte_per_sector;        // 每个扇区字节数

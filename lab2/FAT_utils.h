@@ -1,3 +1,4 @@
+#pragma once
 #include "FileNode.h"
 #include "RootDirEntry.h"
 #include "variables.h"

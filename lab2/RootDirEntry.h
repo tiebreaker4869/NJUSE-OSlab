@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include "FileNode.h"
 #include "variables.h"

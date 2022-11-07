@@ -427,6 +427,25 @@ bool is_l_params(const string &s){
     return true;
 }
 
+// 检查形如 -[config] 的 token 是否满足 l 的要求
+bool check_params_l(vector<string>& cmds){
+    int len = cmds.size();
+
+    for(int i = 1; i < len; i ++){
+        if(cmds[i][0] == '-'){
+            if(!is_l_params(cmds[i]))return false;
+        }
+    }
+
+    return true;
+}
+
+// 检查是否只指定了一个目录, 即只指定了一个，且为目录, 目标目录的 filenode 存到 target .
+bool check_multiple_dir(vector<string>& cmds, FileNode* target){
+    
+    return false;
+}
+
 // handle cmd case: ls
 void handle_ls(FileNode* root){
     if(root->is_file){
@@ -549,18 +568,7 @@ void handle_ls_l(FileNode* root){
     }
 }
 
-// 检查形如 -[config] 的 token 是否满足 l 的要求
-bool check_params_l(vector<string> cmds){
-    int len = cmds.size();
 
-    for(int i = 1; i < len; i ++){
-        if(cmds[i][0] == '-'){
-            if(!is_l_params(cmds[i]))return false;
-        }
-    }
-
-    return true;
-}
 
 void handle_ls_cmd(vector<string> cmds, FileNode* root){
     // 处理 ls 不带参数的情况
@@ -570,11 +578,26 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
 
     int len = cmds.size();
 
+    // 此处检查选项是否合法
     if(!check_params_l(cmds)){
         char* error_msg = "Invalid params!\n";
         my_print_default(error_msg, strlen(error_msg));
+        return;
     }
 
+    FileNode* target = nullptr;
+    // 此处检查是否只指定了小于等于一个目录
+    if(!check_multiple_dir(cmds, target)){
+        char* error_msg = "Multiple directory is not allowed!\n";
+        my_print_default(error_msg, strlen(error_msg));
+        return;
+    }
+
+    if(target == nullptr){
+        handle_ls_l(root);
+    }else {
+        handle_ls_l(target);
+    }
 
 }
 

@@ -465,7 +465,88 @@ void handle_ls(FileNode* root){
 }
 
 void handle_ls_l(FileNode* root){
+    if(root->is_file){
+        return;
+    }
 
+    // 算一下直接子目录和子文件的个数
+    int file_cnt = 0, dir_cnt = 0;
+
+    vector<FileNode*> sub = root->next;
+    int len = sub.size();
+
+    for(int i = 0; i < len; i ++){
+        // sub[i] 是 .. 或者 ., 不计入文件或者目录计数
+        if(!sub[i]->isValid){
+            continue;
+        }
+
+        if(sub[i]->is_file){
+            file_cnt ++;
+        }else {
+            dir_cnt ++;
+        }
+    }
+
+    // 打印当前目录, 直接子目录数, 子文件数
+    string current_dir_info = root->getPath() + " " + to_string(dir_cnt) + " " + to_string(file_cnt) + ":\n";
+    const char* current_dir_info_str = current_dir_info.c_str();
+    my_print_default(current_dir_info_str, strlen(current_dir_info_str));
+
+    // 打印当前目录下的直接子目录和子文件的信息
+    for(int i = 0; i < len; i ++){
+        // 计数的时候不考虑 . 和 .., 但是需要打印 
+        if(!sub[i]->isValid){
+            const char* temp = (sub[i]->getName() + "\n").c_str();
+            my_print_red(temp, strlen(temp));
+            continue;
+        }
+        // 如果是文件, 名字后面跟文件大小
+        if(sub[i]->is_file){
+            string file_info = sub[i]->getName() + " " + to_string(sub[i]->file_size) + "\n";
+            const char* file_info_str = file_info.c_str();
+            my_print_default(file_info_str, strlen(file_info_str));
+        }else {
+            // 如果是目录, 目录名红色 直接子目录数 子文件数
+            int file_cnt = 0, dir_cnt = 0;
+
+            for(int j = 0; j < len; j ++){
+                if(!sub[j]->isValid){
+                    continue;
+                }
+                if(sub[j]->is_file){
+                    file_cnt ++;
+                }else {
+                    dir_cnt ++;
+                }
+            }
+
+            const char* dir_name = (sub[i]->getName() + " ").c_str();
+
+            my_print_red(dir_name, strlen(dir_name));
+
+            const char* cnt_info = (to_string(dir_cnt) + " " + to_string(file_cnt) + "\n").c_str();
+
+            my_print_default(cnt_info, strlen(cnt_info));
+        }
+    }
+
+    my_print_default("\n", 1);
+
+    // 对每个直接子目录(除了 . 和 .. )做递归处理
+
+    for(int i = 0; i < len; i ++){
+        // 不处理 .. 和 .
+        if(!sub[i]->isValid){
+            continue;
+        }
+
+        if(sub[i]->is_file){
+            continue;
+        }
+
+        handle_ls_l(sub[i]);
+    }
 }
 
 // 检查形如 -[config] 的 token 是否满足 l 的要求
@@ -494,7 +575,6 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
         my_print_default(error_msg, strlen(error_msg));
     }
 
-    
 
 }
 

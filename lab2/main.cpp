@@ -123,6 +123,8 @@ class FileNode {
     void addFileChildNode(FileNode* child);
 
     void addDirChildNode(FileNode* child);
+
+    FileNode* findChildByName(string name);
 };
 
 void BPB::initialize(FILE* fat12){
@@ -368,11 +370,13 @@ vector<string> tokenize(const string &str, const string &deliminator){
     }
 
     char* s = new char[str.size() + 1];
-    unique_ptr<char> ptr = make_unique<char>(s);
+    unique_ptr<char> ptr = make_unique<char>();
+    ptr.reset(s);
     strcpy(ptr.get(), str.c_str());
 
     char* delim = new char[deliminator.size() + 1];
-    unique_ptr<char> dptr = make_unique<char>(delim);
+    unique_ptr<char> dptr = make_unique<char>();
+    dptr.reset(delim);
     strcpy(dptr.get(), deliminator.c_str());
 
     char* p = strtok(ptr.get(), dptr.get());
@@ -410,6 +414,16 @@ void FileNode::addDirChildNode(FileNode* child){
     this->directory_count ++;
 }
 
+FileNode* FileNode::findChildByName(string name){
+    for(int i = 0; i < this->next.size(); i ++){
+        if(this->next[i]->getName() == name){
+            return this->next[i];
+        }
+    }
+
+    return nullptr;
+}
+
 // 检查参数, -l, -ll 为正确的形式, -L, -al 等都是错的
 bool is_l_params(const string &s){
     if(s[0] != '-'){
@@ -441,8 +455,41 @@ bool check_params_l(vector<string>& cmds){
 }
 
 // 检查是否只指定了一个目录, 即只指定了一个，且为目录, 目标目录的 filenode 存到 target .
-bool check_multiple_dir(vector<string>& cmds, FileNode* target){
-    
+bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root){
+    int len = cmds.size();
+    int cnt = 0;
+    string dir_name;
+
+    for(int i = 1; i < len; i ++){
+        // 不合法的目录名
+        if(cmds[i][0] != '-' && cmds[i][0] != '/'){
+            return false;
+        }else if(cmds[i][0] == '-'){
+            dir_name = cmds[i];
+            cnt ++;
+        }
+    }
+
+    // 指定了多个目录名
+    if(cnt > 1){
+        return false;
+    }
+
+    // 不带目录名参数，默认为根目录
+    if(cnt == 0){
+        return true;
+    }
+
+    vector<string> path_segs = tokenize(dir_name, "/");
+
+    int path_len = path_segs.size();
+
+    FileNode* current = root;
+
+    for(int i = 0; i < path_len; i ++){
+
+    }
+
     return false;
 }
 
@@ -587,8 +634,8 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
 
     FileNode* target = nullptr;
     // 此处检查是否只指定了小于等于一个目录
-    if(!check_multiple_dir(cmds, target)){
-        char* error_msg = "Multiple directory is not allowed!\n";
+    if(!check_multiple_dir(cmds, target, root)){
+        char* error_msg = "Multiple directory or invalid directory name!\n";
         my_print_default(error_msg, strlen(error_msg));
         return;
     }

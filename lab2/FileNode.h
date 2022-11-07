@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILENODE
+#define FILENODE
 #include <iostream>
 #include <vector>
 
@@ -42,3 +43,4 @@ class FileNode {
 
     FileNode* findChildByName(string name);
 };
+#endif

@@ -1,8 +1,6 @@
-#pragma once
+#ifndef FAT_UTILS
+#define FAT_UTILS
 #include "FileNode.h"
-#include "RootDirEntry.h"
-#include "variables.h"
-#include "BPB.h"
 #include "file_utils.h"
 #include "my_print.h"
 
@@ -27,3 +25,4 @@ void handle_ls_l(FileNode* root);
 void handle_ls_cmd(vector<string> cmds, FileNode* root);
 
 void handle_cat_cmd(vector<string> cmds, FileNode* root);
+#endif

@@ -152,9 +152,9 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
         int current_byte = 0;
 
         while(current_byte < byte_per_cluster){
-            unique_ptr<RootDirEntry> rootEntry = make_unique<RootDirEntry>();
+            RootDirEntry* rootEntry = new RootDirEntry();
             fseek(fat12, cluster_start_byte, SEEK_SET);
-            fread(rootEntry.get(), 1, 32, fat12);
+            fread(rootEntry, 1, 32, fat12);
 
             current_byte += 32;
 
@@ -177,6 +177,8 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
                 root_node->addDirChildNode(child);
                 this->readChildrenNode(fat12, rootEntry->getFirstCluster(), child);
             }
+
+            delete rootEntry;
         }
 
         // 这个其实不需要，因为目录项只有 32 bytes

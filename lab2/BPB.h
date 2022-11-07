@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BPB_
+#define BPB_
 #include <iostream>
 #include "variables.h"
 
@@ -25,3 +26,4 @@ class BPB {
 
     void initialize(FILE* fat12);
 };
+#endif

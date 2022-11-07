@@ -33,22 +33,21 @@ vector<string> tokenize(const string &str, const string &deliminator){
     }
 
     char* s = new char[str.size() + 1];
-    unique_ptr<char> ptr = make_unique<char>();
-    ptr.reset(s);
-    strcpy(ptr.get(), str.c_str());
+    strcpy(s, str.c_str());
 
     char* delim = new char[deliminator.size() + 1];
-    unique_ptr<char> dptr = make_unique<char>();
-    dptr.reset(delim);
-    strcpy(dptr.get(), deliminator.c_str());
+    strcpy(delim, deliminator.c_str());
 
-    char* p = strtok(ptr.get(), dptr.get());
+    char* p = strtok(s, delim);
 
     while(p){
         string token = p;
         res.push_back(token);
-        p = strtok(NULL, dptr.get());
+        p = strtok(NULL, delim);
     }
 
+    delete[] delim;
+    delete[] s;
+    
     return res;
 }

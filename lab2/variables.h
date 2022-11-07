@@ -1,5 +1,6 @@
-#pragma once
+#ifndef VARIABLE
 // 全局变量
+#define VARIABLE
 
 int byte_per_sector;        // 每个扇区字节数
 int sector_per_cluster;     // 每簇扇区数
@@ -13,3 +14,5 @@ int fat_base_addr;
 int root_base_addr;
 int data_base_addr;
 int byte_per_cluster;
+
+#endif

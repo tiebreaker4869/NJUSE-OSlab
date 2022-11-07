@@ -1,4 +1,6 @@
 #include "FAT_utils.h"
+#include "BPB.h"
+#include "RootDirEntry.h"
 using namespace std;
 
 int main(){
@@ -27,7 +29,7 @@ int main(){
         if(cmds[0] == "exit"){
             // 用户输入 exit，关闭文件并退出
             fclose(fat12);
-            char* exit_msg = "exit";
+            char* exit_msg = "exit\n";
             my_print_default(exit_msg, strlen(exit_msg));
             break;
         }else if(cmds[0] == "cat"){
@@ -35,7 +37,7 @@ int main(){
         }else if(cmds[0] == "ls"){
             handle_ls_cmd(cmds, rootNode);
         }else {
-            char* unknown_cmd = "Unknown command!";
+            char* unknown_cmd = "Unknown command!\n";
             my_print_default(unknown_cmd, strlen(unknown_cmd));
         }
     }

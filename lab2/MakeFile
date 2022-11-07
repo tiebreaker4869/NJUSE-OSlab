@@ -1,0 +1,27 @@
+
+output: main.o
+	gcc RootDirEntry.o my_print.o FileNode.o file_utils.o FAT_utils.o BPB.o main.o -o output
+
+BPB.o: BPB.h BPB.cpp variables.h
+	gcc -c BPB.cpp
+
+FAT_utils.o: FAT_utils.h FAT_utils.cpp my_print.o FileNode.o file_utils.o
+	gcc -c FAT_utils.cpp
+
+file_utils.o: file_utils.h file_utils.cpp variables.h
+	gcc -c file_utils.cpp
+
+FileNode.o: FileNode.h FileNode.cpp
+	gcc -c FileNode.cpp
+
+my_print.o: my_print.asm my_print.h
+	nasm -f elf -o my_print.o my_print.asm
+
+RootDirEntry.o: RootDirEntry.h RootDirEntry.cpp file_utils.o my_print.o
+	gcc -c RootDirEntry.cpp
+
+main.o: main.cpp FAT_utils.o BPB.o RootDirEntry.o
+	gcc -c main.cpp
+
+clean:
+	rm *.o output

@@ -1,7 +1,7 @@
-#pragma once
+#ifndef ROOTDIRENTRY
+#define ROOTDIRENTRY
 #include <iostream>
 #include "FileNode.h"
-#include "variables.h"
 #include "file_utils.h"
 #include "my_print.h"
 #include <cstring>
@@ -46,3 +46,5 @@ class RootDirEntry {
 
     void readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNode* root_node);
 };
+
+#endif

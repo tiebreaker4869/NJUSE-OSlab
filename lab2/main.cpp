@@ -1,7 +1,6 @@
 #include "FAT_utils.h"
 using namespace std;
 
-
 int main(){
 
     char* fat_path = "";

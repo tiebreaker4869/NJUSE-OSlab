@@ -1,6 +1,9 @@
 #include "FAT_utils.h"
 #include "BPB.h"
 #include "RootDirEntry.h"
+#include "FileNode.h"
+#include "my_print.h"
+
 using namespace std;
 
 int main(){

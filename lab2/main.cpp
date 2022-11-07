@@ -486,11 +486,23 @@ bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root){
 
     FileNode* current = root;
 
+    // 找到目标目录
     for(int i = 0; i < path_len; i ++){
-
+        FileNode* child = root->findChildByName(path_segs[i]);
+        if(child == nullptr){
+            return false;
+        }
+        current = child;
     }
 
-    return false;
+    // 如果目标是文件, 那么不合法
+    if(current->is_file){
+        return false;
+    }
+
+    target = current;
+
+    return true;
 }
 
 // handle cmd case: ls

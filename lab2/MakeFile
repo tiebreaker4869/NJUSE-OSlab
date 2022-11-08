@@ -1,12 +1,7 @@
-output: main.o my_print.o
-	gcc -m32 -o output main.cpp my_print.o -lstdc++
-
-my_print.o: my_print.asm
-	nasm -f elf -o my_print.o my_print.asm
-
-main.o: main.cpp
-	gcc -m32 -c main.cpp
-
+main: main.cpp my_print.asm
+	nasm -f elf32 my_print.asm
+	g++ -m32 main.cpp my_print.o -o main -std=c++11
+	rm -rf my_print.o
 clean:
-	rm *.o output
+	rm -rf main *.o
 	

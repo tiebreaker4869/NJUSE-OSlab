@@ -16,10 +16,15 @@ int fat_base_addr;
 int root_base_addr;
 int data_base_addr;
 int byte_per_cluster;
+extern "C"{
+    void my_print_default(const char* str, int length);
 
-void my_print_default(const char* str, int length);
+    void my_print_red(const char* str, int length);
+}
 
-void my_print_red(const char* str, int length);
+void myPrintDefault(const char* str);
+
+void myPrintRed(const char* str);
 
 
 // Boot Record 数据部分数据结构
@@ -147,13 +152,11 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root);
 void handle_cat_cmd(vector<string> cmds, FileNode* root);
 
 int main(){
-
-    char* fat_path = "";
+    char* fat_path = "./fat12.img";
     FILE* fat12 = fopen(fat_path, "rb"); // 打开 FAT12 映像文件
 
     BPB* bpb = new BPB();
     bpb->initialize(fat12); // 读取 boot 记录数据部分并初始化后面要使用的全局变量
-
     FileNode* rootNode = new FileNode();
     rootNode->setPath("/");
     rootNode->setName("");
@@ -162,7 +165,7 @@ int main(){
     rootEntry->initRootDirArea(fat12, rootNode); 
 
     while(true){
-        my_print_default(">", 1);
+        myPrintDefault(">");
 
         string cmd;
         getline(cin, cmd);
@@ -173,7 +176,7 @@ int main(){
             // 用户输入 exit，关闭文件并退出
             fclose(fat12);
             char* exit_msg = "exit\n";
-            my_print_default(exit_msg, strlen(exit_msg));
+            myPrintDefault(exit_msg);
             break;
         }else if(cmds[0] == "cat"){
             handle_cat_cmd(cmds, rootNode);
@@ -181,7 +184,7 @@ int main(){
             handle_ls_cmd(cmds, rootNode);
         }else {
             char* unknown_cmd = "Unknown command!\n";
-            my_print_default(unknown_cmd, strlen(unknown_cmd));
+            myPrintDefault(unknown_cmd);
         }
     }
 
@@ -395,7 +398,7 @@ void handle_ls(FileNode* root){
 
     const char* path_str = path.c_str();
 
-    my_print_default(path_str, strlen(path_str));
+    myPrintDefault(path_str);
 
     vector<FileNode*> sub = root->next;
 
@@ -405,15 +408,15 @@ void handle_ls(FileNode* root){
         if(sub[i]->is_file){
             string name = sub[i]->getName() + " ";
             const char* name_str = name.c_str();
-            my_print_default(name_str, strlen(name_str));
+            myPrintDefault(name_str);
         }else {
             string name = sub[i]->getName() + " ";
             const char* name_str = name.c_str();
-            my_print_red(name_str, strlen(name_str));
+            myPrintRed(name_str);
         }
     }
 
-    my_print_default("\n", 1);
+    myPrintDefault("\n");
 
     for(int i = 0; i < len; i ++){
         if(sub[i]->isValid){
@@ -449,21 +452,21 @@ void handle_ls_l(FileNode* root){
     // 打印当前目录, 直接子目录数, 子文件数
     string current_dir_info = root->getPath() + " " + to_string(dir_cnt) + " " + to_string(file_cnt) + ":\n";
     const char* current_dir_info_str = current_dir_info.c_str();
-    my_print_default(current_dir_info_str, strlen(current_dir_info_str));
+    myPrintDefault(current_dir_info_str);
 
     // 打印当前目录下的直接子目录和子文件的信息
     for(int i = 0; i < len; i ++){
         // 计数的时候不考虑 . 和 .., 但是需要打印 
         if(!sub[i]->isValid){
             const char* temp = (sub[i]->getName() + "\n").c_str();
-            my_print_red(temp, strlen(temp));
+            myPrintRed(temp);
             continue;
         }
         // 如果是文件, 名字后面跟文件大小
         if(sub[i]->is_file){
             string file_info = sub[i]->getName() + " " + to_string(sub[i]->file_size) + "\n";
             const char* file_info_str = file_info.c_str();
-            my_print_default(file_info_str, strlen(file_info_str));
+            myPrintDefault(file_info_str);
         }else {
             // 如果是目录, 目录名红色 直接子目录数 子文件数
             int file_cnt = 0, dir_cnt = 0;
@@ -481,15 +484,15 @@ void handle_ls_l(FileNode* root){
 
             const char* dir_name = (sub[i]->getName() + " ").c_str();
 
-            my_print_red(dir_name, strlen(dir_name));
+            myPrintRed(dir_name);
 
             const char* cnt_info = (to_string(dir_cnt) + " " + to_string(file_cnt) + "\n").c_str();
 
-            my_print_default(cnt_info, strlen(cnt_info));
+            myPrintDefault(cnt_info);
         }
     }
 
-    my_print_default("\n", 1);
+    myPrintDefault("\n");
 
     // 对每个直接子目录(除了 . 和 .. )做递归处理
 
@@ -520,7 +523,7 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
     // 此处检查选项是否合法
     if(!check_params_l(cmds)){
         char* error_msg = "Invalid params!\n";
-        my_print_default(error_msg, strlen(error_msg));
+        myPrintDefault(error_msg);
         return;
     }
 
@@ -528,7 +531,7 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
     // 此处检查是否只指定了小于等于一个目录
     if(!check_multiple_dir(cmds, target, root)){
         char* error_msg = "Multiple directory or invalid directory name!\n";
-        my_print_default(error_msg, strlen(error_msg));
+        myPrintDefault(error_msg);
         return;
     }
 
@@ -653,7 +656,7 @@ void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNod
         // 值为 0xFF7 说明是一个坏簇
         if(next_cluster == 0xFF7){
             char* error_message = "error in fillFileContent: bad cluster, Something wrong with the file!";
-            my_print_default(error_message, strlen(error_message));
+           myPrintDefault(error_message);
             break;
         }
 
@@ -687,7 +690,7 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
         if(next_cluster == 0xFF7){
             // 0xFF7 表示坏簇
             char* error_message = "error in readChildrenNode: bad cluster, something wrong in the file.";
-            my_print_default(error_message, strlen(error_message));
+            myPrintDefault(error_message);
             break;
         }
 
@@ -728,4 +731,12 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
         // 这个其实不需要，因为目录项只有 32 bytes
         current_cluster = next_cluster;
     }
+}
+
+void myPrintDefault(const char* str){
+    my_print_default(str, strlen(str));
+}
+
+void myPrintRed(const char* str){
+    my_print_red(str, strlen(str));
 }

@@ -367,7 +367,7 @@ bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root){
         // 不合法的目录名
         if(cmds[i][0] != '-' && cmds[i][0] != '/'){
             return false;
-        }else if(cmds[i][0] == '-'){
+        }else if(cmds[i][0] == '/'){
             dir_name = cmds[i];
             cnt ++;
         }
@@ -490,12 +490,13 @@ void handle_ls_l(FileNode* root){
         }else {
             // 如果是目录, 目录名红色 直接子目录数 子文件数
             int file_cnt = 0, dir_cnt = 0;
-
-            for(int j = 0; j < len; j ++){
-                if(!sub[j]->isValid){
+            int sub_len = sub[i]->next.size();
+            vector<FileNode*> &secondary_sub = sub[i]->next;
+            for(int j = 0; j < sub_len; j ++){
+                if(!secondary_sub[j]->isValid){
                     continue;
                 }
-                if(sub[j]->is_file){
+                if(secondary_sub[j]->is_file){
                     file_cnt ++;
                 }else {
                     dir_cnt ++;

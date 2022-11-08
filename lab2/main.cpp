@@ -149,6 +149,7 @@ int getFATEntry(FILE* fat12, int index);
 
 vector<string> tokenize(const string &str, const string &deliminator);
 
+void do_cat(string filename, FileNode* root);
 
 void handle_ls_cmd(vector<string> cmds, FileNode* root);
 
@@ -568,8 +569,54 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
 
 }
 
-void handle_cat_cmd(vector<string> cmds, FileNode* root){
+void outputFile(FileNode* file){
+    if(!file->is_file){
+        char* error_msg = "outputFile: args should be a file!\n";
+        myPrintDefault(error_msg);
 
+        return;
+    }
+
+    myPrintDefault(file->getContent());
+    myPrintDefault("\n");
+}
+
+void do_cat(string filename, FileNode* root){
+    vector<string> path_segs = tokenize(filename, "/");
+    int len_segs = path_segs.size();
+
+    FileNode* current = root;
+
+    for(int i = 0; i < len_segs-1; i ++){
+        FileNode* child = current->findChildByName(path_segs[i]);
+        if(child == nullptr || child->is_file){
+            char* error_msg = "do_cat: Invalid path!\n";
+            myPrintDefault(error_msg);
+            return;
+        }
+
+        current = child;
+    }
+
+    current = current->findChildByName(path_segs[len_segs-1]);
+
+    if(current == nullptr){
+        char* error_msg = "do_cat: Invalid path!\n";
+        myPrintDefault(error_msg);
+        return;
+    }
+
+    outputFile(current);
+}
+
+void handle_cat_cmd(vector<string> cmds, FileNode* root){
+    if(cmds.size() != 2){
+        char* error_msg = "cat: Incorrect amount of arguments!\n";
+        myPrintDefault(error_msg);
+        return;
+    }
+
+    do_cat(cmds[1], root);
 }
 
 void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){

@@ -392,9 +392,9 @@ bool check_multiple_dir(vector<string>& cmds, FileNode* &target, FileNode* root)
 
     // 找到目标目录
     for(int i = 0; i < path_len; i ++){
-        FileNode* child = root->findChildByName(path_segs[i]);
+        FileNode* child = current->findChildByName(path_segs[i]);
         if(child == nullptr){
-            //out << "Not Found" << endl;
+            cout << "Not Found" << endl;
             return false;
         }
         current = child;
@@ -633,11 +633,13 @@ void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
         if(!this->isEmptyName() && !this->isInvalidName()){
             if(this->isFile()){
                 this->makeFileName(name);
+                
                 FileNode* child = new FileNode(name, root->getPath(), this->isFile(), this->file_size);
                 root->addFileChildNode(child);
                 this->fillFileContent(fat12, this->getFirstCluster(), child);
             }else {
                 this->makeDirName(name);
+
                 FileNode* child = new FileNode();
                 child->setName(name);
                 child->setPath(root->getPath() + name + "/");

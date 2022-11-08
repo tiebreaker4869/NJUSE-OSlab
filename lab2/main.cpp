@@ -138,7 +138,7 @@ bool is_l_params(const string &s);
 bool check_params_l(vector<string>& cmds);
 
 // 检查是否只指定了一个目录, 即只指定了一个，且为目录, 目标目录的 filenode 存到 target .
-bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root);
+bool check_multiple_dir(vector<string>& cmds, FileNode* &target, FileNode* root);
 
 // handle cmd case: ls
 void handle_ls(FileNode* root);
@@ -358,7 +358,7 @@ bool check_params_l(vector<string>& cmds){
 }
 
 // 检查是否只指定了一个目录, 即只指定了一个，且为目录, 目标目录的 filenode 存到 target .
-bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root){
+bool check_multiple_dir(vector<string>& cmds, FileNode* &target, FileNode* root){
     int len = cmds.size();
     int cnt = 0;
     string dir_name;
@@ -393,6 +393,7 @@ bool check_multiple_dir(vector<string>& cmds, FileNode* target, FileNode* root){
     for(int i = 0; i < path_len; i ++){
         FileNode* child = root->findChildByName(path_segs[i]);
         if(child == nullptr){
+            //out << "Not Found" << endl;
             return false;
         }
         current = child;
@@ -558,8 +559,10 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
     }
 
     if(target == nullptr){
+        //cout << "target is nullptr" << endl;
         handle_ls_l(root);
     }else {
+        //cout << "target is not nullptr" << endl;
         handle_ls_l(target);
     }
 

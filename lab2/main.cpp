@@ -26,22 +26,23 @@ void myPrintDefault(const char* str);
 
 void myPrintRed(const char* str);
 
+#pragma pack(1)
 
 // Boot Record 数据部分数据结构
 class BPB {
     public:
-    uint16_t bytes_per_sector; // 每个扇区的字节数
-    uint8_t sector_per_cluster; // 每个簇的扇区数
-    uint16_t reserved_sector; // boot record 占用的扇区数
-    uint8_t FAT_num; // FAT 的数量
+    uint16_t bytes_per_sector_; // 每个扇区的字节数
+    uint8_t sector_per_cluster_; // 每个簇的扇区数
+    uint16_t reserved_sector_; // boot record 占用的扇区数
+    uint8_t FAT_num_; // FAT 的数量
     uint16_t MAX_FILE_NUM_IN_ROOT; // 根目录文件数的最大值
-    uint16_t sector_count; // 总扇区数
-    uint8_t media_descriptor; // 介质描述符
-    uint16_t FAT_sector_count; // 每个 FAT 的扇区数
-    uint16_t sector_per_track; //每个 track 的扇区数
-    uint16_t num_of_heads; // 磁头的个数
-    uint32_t hidden_sector; // 隐藏扇区的个数
-    uint32_t large_sector_count; // 如果 sector_count 为 0，该值为总扇区数
+    uint16_t sector_count_; // 总扇区数
+    uint8_t media_descriptor_; // 介质描述符
+    uint16_t FAT_sector_count_; // 每个 FAT 的扇区数
+    uint16_t sector_per_track_; //每个 track 的扇区数
+    uint16_t num_of_heads_; // 磁头的个数
+    uint32_t hidden_sector_; // 隐藏扇区的个数
+    uint32_t large_sector_count_; // 如果 sector_count 为 0，该值为总扇区数
 
 
     BPB(){}
@@ -112,6 +113,8 @@ class RootDirEntry {
 
     bool isInvalidName();
 
+    bool isValidNameAt(int j);
+
     bool isFile();
 
     void makeFileName(char* name);
@@ -152,7 +155,7 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root);
 void handle_cat_cmd(vector<string> cmds, FileNode* root);
 
 int main(){
-    char* fat_path = "./fat12.img";
+    char* fat_path = "./fat.img";
     FILE* fat12 = fopen(fat_path, "rb"); // 打开 FAT12 映像文件
 
     BPB* bpb = new BPB();
@@ -196,18 +199,29 @@ void BPB::initialize(FILE* fat12){
     fread(this, 1, 25, fat12); // BPB 长 25 个字节
 
     // 初始化要使用的全局变量
-    byte_per_sector = this->bytes_per_sector;
-    sector_per_cluster = this->sector_per_cluster;
-    record_sector_count = this->reserved_sector;
-    nums_of_FAT = this->FAT_num;
+    byte_per_sector = this->bytes_per_sector_;
+    sector_per_cluster = this->sector_per_cluster_;
+    record_sector_count = this->reserved_sector_;
+    nums_of_FAT = this->FAT_num_;
     root_entry_count = this->MAX_FILE_NUM_IN_ROOT;
 
+    // cout << "bps: " << byte_per_sector << endl;
+    // cout << "spc: " << sector_per_cluster << endl;
+    // cout << "rsc: " << record_sector_count << endl;
+    // cout << "nof: " << nums_of_FAT << endl;
+    // cout << "rec: " << root_entry_count << endl;
+
     // FAT 占用的扇区数
-    if(this->sector_count != 0){
-        FAT_size = this->sector_count;
+    if(this->sector_count_ != 0){
+        FAT_size = this->FAT_sector_count_;
     }else {
-        FAT_size = this->large_sector_count;
+        FAT_size = this->large_sector_count_;
     }
+
+    
+    // cout << "FAT size: " << FAT_size << endl;
+    // cout << "FAT NUM: " << nums_of_FAT << endl;
+    
 
     // FAT1 的起始地址: FAT1 在 boot record 后面
     fat_base_addr = record_sector_count * byte_per_sector;
@@ -217,6 +231,12 @@ void BPB::initialize(FILE* fat12){
     data_base_addr = root_base_addr + (root_entry_count * 32 + byte_per_sector - 1) / byte_per_sector * byte_per_sector;
     byte_per_cluster = byte_per_sector * sector_per_cluster;
 
+    
+    // cout << "fat base: " << fat_base_addr << endl;
+    // cout << "root base: " << root_base_addr << endl;
+    // cout << "data base: " << data_base_addr << endl;
+    // cout << "bpc: " << byte_per_cluster << endl;
+    
 }
 
 FileNode::FileNode(string name, bool isValid){
@@ -237,8 +257,8 @@ void FileNode::addFileChildNode(FileNode* child){
 }
 
 void FileNode::addDirChildNode(FileNode* child){
-    this->next.push_back(new FileNode(".", false));
-    this->next.push_back(new FileNode("..", false));
+    child->next.push_back(new FileNode(".", false));
+    child->next.push_back(new FileNode("..", false));
     this->next.push_back(child);
     this->directory_count ++;
 }
@@ -406,11 +426,11 @@ void handle_ls(FileNode* root){
 
     for(int i = 0; i < len; i ++){
         if(sub[i]->is_file){
-            string name = sub[i]->getName() + " ";
+            string name = sub[i]->getName() + "  ";
             const char* name_str = name.c_str();
             myPrintDefault(name_str);
         }else {
-            string name = sub[i]->getName() + " ";
+            string name = sub[i]->getName() + "  ";
             const char* name_str = name.c_str();
             myPrintRed(name_str);
         }
@@ -491,7 +511,7 @@ void handle_ls_l(FileNode* root){
             myPrintDefault(cnt_info);
         }
     }
-
+    
     myPrintDefault("\n");
 
     // 对每个直接子目录(除了 . 和 .. )做递归处理
@@ -516,6 +536,7 @@ void handle_ls_cmd(vector<string> cmds, FileNode* root){
     // 处理 ls 不带参数的情况
     if(cmds.size() == 1){
         handle_ls(root);
+        return;
     }
 
     int len = cmds.size();
@@ -592,16 +613,22 @@ bool isCapitalAlphaOrDigit(char c){
     return false;
 }
 
-bool RootDirEntry::isInvalidName(){
+bool RootDirEntry::isValidNameAt(int j) {
+    return ((this->filename[j] >= 'a') && (this->filename[j] <= 'z'))
+           ||((this->filename[j] >= 'A') && (this->filename[j] <= 'Z'))
+           ||((this->filename[j] >= '0') && (this->filename[j] <= '9'))
+           ||((this->filename[j] == ' '));
+}
 
-    for(int i = 0; i < 11; i ++){
-        char c = this->filename[i];
-        if(!isCapitalAlphaOrDigit(c)){
-            return true;
+bool RootDirEntry::isInvalidName(){
+    int invalid = false;
+    for (int k = 0; k < 11; ++k) {
+        if (!this->isValidNameAt(k)) {
+            invalid = true;
+            break;
         }
     }
-
-    return false;
+    return invalid;
 }
 
 bool RootDirEntry::isFile(){
@@ -621,20 +648,31 @@ uint16_t RootDirEntry::getFirstCluster(){
 
 
 void RootDirEntry::makeFileName(char* name){
-
-    for(int i = 0; i < 11; i ++){
-        name[i] = this->filename[i];
+    int tmp = -1;
+    for (int j = 0; j < 11; ++j) {
+        if (this->filename[j] != ' ') {
+            name[++tmp] = this->filename[j];
+        } else {
+            name[++tmp] = '.';
+            while (this->filename[j] == ' ') j++;
+            j--;
+        }
     }
-
-    name[11] = '\0';
+    ++tmp;
+    name[tmp] = '\0';
 }
 
 void RootDirEntry::makeDirName(char* name){
-    for(int i = 0; i < 11; i ++){
-        name[i] = this->filename[i];
+    int tmp = -1;
+    for (int k = 0; k < 11; ++k) {
+        if (this->filename[k] != ' ') {
+            name[++tmp] = this->filename[k];
+        } else {
+            tmp++;
+            name[tmp] = '\0';
+            break;
+        }
     }
-
-    name[11] = '\0';
 }
 
 void RootDirEntry::fillFileContent(FILE* fat12, uint16_t cluster_number, FileNode* file){
@@ -700,7 +738,7 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t cluster_number, FileNo
 
         while(current_byte < byte_per_cluster){
             RootDirEntry* rootEntry = new RootDirEntry();
-            fseek(fat12, cluster_start_byte, SEEK_SET);
+            fseek(fat12, cluster_start_byte + current_byte, SEEK_SET);
             fread(rootEntry, 1, 32, fat12);
 
             current_byte += 32;

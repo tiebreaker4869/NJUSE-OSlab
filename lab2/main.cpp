@@ -129,8 +129,6 @@ class RootDirEntry {
 
     bool isInvalidName();
 
-    bool isValidNameAt(int j);
-
     bool isFile();
 
     void makeFileName(char* name);
@@ -391,7 +389,7 @@ bool checkMultipleDirs(vector<string>& cmds, FileNode* &target, FileNode* root){
     for(int i = 0; i < pathLen; i ++){
         FileNode* child = current->findChildByName(pathSegs[i]);
         if(child == nullptr){
-            cout << "Not Found" << endl;
+            myPrintDefault("File Not Found!\n");
             return false;
         }
         current = child;
@@ -651,17 +649,17 @@ bool RootDirEntry::isEmptyName(){
     return this->filename[0] == '\0';
 }
 
-bool RootDirEntry::isValidNameAt(int j) {
-    return ((this->filename[j] >= 'a') && (this->filename[j] <= 'z'))
-           ||((this->filename[j] >= 'A') && (this->filename[j] <= 'Z'))
-           ||((this->filename[j] >= '0') && (this->filename[j] <= '9'))
-           ||((this->filename[j] == ' '));
+static bool checkValidName(char c) {
+    return ((c >= 'a') && (c <= 'z'))
+           ||((c >= 'A') && (c <= 'Z'))
+           ||((c >= '0') && (c <= '9'))
+           ||((c == ' '));
 }
 
 bool RootDirEntry::isInvalidName(){
     int invalid = false;
     for (int k = 0; k < 11; ++k) {
-        if (!this->isValidNameAt(k)) {
+        if (!checkValidName(k)) {
             invalid = true;
             break;
         }

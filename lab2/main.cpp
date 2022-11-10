@@ -4,6 +4,22 @@
 
 using namespace std;
 
+const char* INVALID_PARAMS = "Invalid Params!\n";
+
+const char* MULTIPLE_DIR_ERROR = "Multiple directory or invalid directory name!\n";
+
+const char* INCORRECT_ARGS_AMOUNT = "Incorrect amount of args is provided!\n";
+
+const char* BAD_CLUSTER = "Bad Cluster!\n";
+
+const char* LS_CASE = "In ls: ";
+
+const char* CAT_CASE = "In cat: ";
+
+const char* EXIT = "exit.\n";
+
+const char* UNK_CMD = "Unknown commands!\n";
+
 int bytePerSector;        // 每个扇区字节数
 int sectorPerCluster;     // 每簇扇区数
 int recordSectorCount;    // boot 记录占用的扇区数
@@ -156,7 +172,7 @@ void handleLSCmd(vector<string> cmds, FileNode* root);
 void handleCAT(vector<string> cmds, FileNode* root);
 
 int main(){
-    char* fat_path = "./fat.img";
+    const char* fat_path = "./fat.img";
     FILE* fat12 = fopen(fat_path, "rb"); // 打开 FAT12 映像文件
 
     BPB* bpb = new BPB();
@@ -179,16 +195,14 @@ int main(){
         if(cmds[0] == "exit"){
             // 用户输入 exit，关闭文件并退出
             fclose(fat12);
-            char* exit_msg = "exit\n";
-            myPrintDefault(exit_msg);
+            myPrintDefault(EXIT);
             break;
         }else if(cmds[0] == "cat"){
             handleCAT(cmds, rootNode);
         }else if(cmds[0] == "ls"){
             handleLSCmd(cmds, rootNode);
         }else {
-            char* unknown = "Unknown command!\n";
-            myPrintDefault(unknown);
+            myPrintDefault(UNK_CMD);
         }
     }
 
@@ -529,16 +543,16 @@ void handleLSCmd(vector<string> cmds, FileNode* root){
 
     // 此处检查选项是否合法
     if(!checkParamsL(cmds)){
-        char* error_msg = "Invalid params!\n";
-        myPrintDefault(error_msg);
+        myPrintDefault(LS_CASE);
+        myPrintDefault(INVALID_PARAMS);
         return;
     }
 
     FileNode* target = nullptr;
     // 此处检查是否只指定了小于等于一个目录
     if(!checkMultipleDirs(cmds, target, root)){
-        char* error_msg = "Multiple directory or invalid directory name!\n";
-        myPrintDefault(error_msg);
+        myPrintDefault(LS_CASE);
+        myPrintDefault(MULTIPLE_DIR_ERROR);
         return;
     }
 
@@ -554,8 +568,8 @@ void handleLSCmd(vector<string> cmds, FileNode* root){
 
 void outputFile(FileNode* file){
     if(!file->isFile_){
-        char* error_msg = "outputFile: args should be a file!\n";
-        myPrintDefault(error_msg);
+        myPrintDefault(CAT_CASE);
+        myPrintDefault(INVALID_PARAMS);
 
         return;
     }
@@ -573,8 +587,8 @@ void doCAT(string filename, FileNode* root){
     for(int i = 0; i < segLen-1; i ++){
         FileNode* child = current->findChildByName(pathSegs[i]);
         if(child == nullptr || child->isFile_){
-            char* error_msg = "doCAT: Invalid path!\n";
-            myPrintDefault(error_msg);
+            myPrintDefault(CAT_CASE);
+            myPrintDefault(INVALID_PARAMS);
             return;
         }
 
@@ -584,8 +598,8 @@ void doCAT(string filename, FileNode* root){
     current = current->findChildByName(pathSegs[segLen-1]);
 
     if(current == nullptr){
-        char* error_msg = "doCAT: Invalid path!\n";
-        myPrintDefault(error_msg);
+        myPrintDefault(CAT_CASE);
+        myPrintDefault(INVALID_PARAMS);
         return;
     }
 
@@ -594,8 +608,8 @@ void doCAT(string filename, FileNode* root){
 
 void handleCAT(vector<string> cmds, FileNode* root){
     if(cmds.size() != 2){
-        char* error_msg = "cat: Incorrect amount of arguments!\n";
-        myPrintDefault(error_msg);
+        myPrintDefault(LS_CASE);
+        myPrintDefault(INCORRECT_ARGS_AMOUNT);
         return;
     }
 
@@ -603,15 +617,15 @@ void handleCAT(vector<string> cmds, FileNode* root){
 }
 
 void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
-    int cur_addr = rootBaseAddr;
+    int curAddr = rootBaseAddr;
     char name[12];
 
     for(int i = 0; i < rootEntryCount; i ++){
         // 依次读取每个根目录区表项
-        fseek(fat12, cur_addr, SEEK_SET);
+        fseek(fat12, curAddr, SEEK_SET);
         fread(this, 1, 32, fat12);
 
-        cur_addr += 32;
+        curAddr += 32;
 
         if(!this->isEmptyName() && !this->isInvalidName()){
             if(this->isFile()){
@@ -635,18 +649,6 @@ void RootDirEntry::initRootDirArea(FILE* fat12, FileNode* root){
 
 bool RootDirEntry::isEmptyName(){
     return this->filename[0] == '\0';
-}
-
-bool isCapitalAlphaOrDigit(char c){
-    if(c >= '0' && c <= '9'){
-        return true;
-    }
-
-    if(c >= 'A' && c <= 'Z'){
-        return true;
-    }
-
-    return false;
 }
 
 bool RootDirEntry::isValidNameAt(int j) {
@@ -681,34 +683,37 @@ uint16_t RootDirEntry::getFirstCluster(){
     return this->clusterNumber;
 }
 
-
-
 void RootDirEntry::makeFileName(char* name){
-    int tmp = -1;
-    for (int j = 0; j < 11; ++j) {
-        if (this->filename[j] != ' ') {
-            name[++tmp] = this->filename[j];
-        } else {
-            name[++tmp] = '.';
-            while (this->filename[j] == ' ') j++;
-            j--;
-        }
+    int i = 0;
+
+    // 前 8 位是文件名
+    while(i < 8 && this->filename[i] != ' '){
+        name[i] = this->filename[i];
+        i ++;
     }
-    ++tmp;
-    name[tmp] = '\0';
+
+    name[i] = '.';
+
+    i ++;
+
+    //最后三位是扩展名
+    int k = 8;
+
+    while(k < 11 && this->filename[k] != ' '){
+        name[i] = this->filename[k];
+        i ++;
+        k ++;
+    }
+    name[i] = '\0';
 }
 
 void RootDirEntry::makeDirName(char* name){
-    int tmp = -1;
-    for (int k = 0; k < 11; ++k) {
-        if (this->filename[k] != ' ') {
-            name[++tmp] = this->filename[k];
-        } else {
-            tmp++;
-            name[tmp] = '\0';
-            break;
-        }
+    int i = 0;
+    while(i < 11 && this->filename[i] != ' '){
+        name[i] = this->filename[i];
+        i ++;
     }
+    name[i] = '\0';
 }
 
 void RootDirEntry::fillFileContent(FILE* fat12, uint16_t clusterNumber, FileNode* file){
@@ -729,8 +734,7 @@ void RootDirEntry::fillFileContent(FILE* fat12, uint16_t clusterNumber, FileNode
 
         // 值为 0xFF7 说明是一个坏簇
         if(nextCluster == 0xFF7){
-            char* error_message = "error in fillFileContent: bad cluster, Something wrong with the file!";
-           myPrintDefault(error_message);
+           myPrintDefault(BAD_CLUSTER);
             break;
         }
 
@@ -763,8 +767,7 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t clusterNumber, FileNod
         nextCluster = getFATEntry(fat12, currentCluster);
         if(nextCluster == 0xFF7){
             // 0xFF7 表示坏簇
-            char* error_message = "error in readChildrenNode: bad cluster, something wrong in the file.";
-            myPrintDefault(error_message);
+            myPrintDefault(BAD_CLUSTER);
             break;
         }
 

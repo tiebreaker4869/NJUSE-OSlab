@@ -659,7 +659,7 @@ static bool checkValidName(char c) {
 bool RootDirEntry::isInvalidName(){
     int invalid = false;
     for (int k = 0; k < 11; ++k) {
-        if (!checkValidName(k)) {
+        if (!checkValidName(this->filename[k])) {
             invalid = true;
             break;
         }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <stack>
 
 using namespace std;
 
@@ -361,9 +362,9 @@ bool checkMultipleDirs(vector<string>& cmds, FileNode* &target, FileNode* root){
 
     for(int i = 1; i < len; i ++){
         // 不合法的目录名
-        if(cmds[i][0] != '-' && cmds[i][0] != '/'){
+        if(cmds[i][0] != '-' && cmds[i][0] != '/' && cmds[i][0] != '.' && (cmds[i][0] < 'A' || cmds[i][0] > 'Z')){
             return false;
-        }else if(cmds[i][0] == '/'){
+        }else if(cmds[i][0] == '/' || cmds[i][0] == '.' || (cmds[i][0] >= 'A' && cmds[i][0] <= 'Z')){
             dirName = cmds[i];
             cnt ++;
         }
@@ -385,13 +386,29 @@ bool checkMultipleDirs(vector<string>& cmds, FileNode* &target, FileNode* root){
 
     FileNode* current = root;
 
+    stack<FileNode*> visited;
+
     // 找到目标目录
     for(int i = 0; i < pathLen; i ++){
+        if(pathSegs[i] == "."){
+            continue;
+        }else if(pathSegs[i] == ".."){
+            if(visited.empty()){
+                continue;
+            }
+            FileNode* parent = visited.top();
+            visited.pop();
+            current = parent;
+            continue;
+        }
         FileNode* child = current->findChildByName(pathSegs[i]);
         if(child == nullptr){
             myPrintDefault("File Not Found!\n");
             return false;
         }
+        
+        visited.push(current);
+
         current = child;
     }
 
@@ -555,10 +572,8 @@ void handleLSCmd(vector<string> cmds, FileNode* root){
     }
 
     if(target == nullptr){
-        //cout << "target is nullptr" << endl;
         handleLSL(root);
     }else {
-        //cout << "target is not nullptr" << endl;
         handleLSL(target);
     }
 
@@ -582,13 +597,28 @@ void doCAT(string filename, FileNode* root){
 
     FileNode* current = root;
 
+    stack<FileNode*> visited;
+
     for(int i = 0; i < segLen-1; i ++){
+        if(pathSegs[i] == "."){
+            continue;
+        }else if(pathSegs[i] == ".."){
+            if(visited.empty()){
+                continue;
+            }
+            FileNode* parent = visited.top();
+            visited.pop();
+            current = parent;
+            continue;
+        }
         FileNode* child = current->findChildByName(pathSegs[i]);
         if(child == nullptr || child->isFile_){
             myPrintDefault(CAT_CASE);
             myPrintDefault(INVALID_PARAMS);
             return;
         }
+
+        visited.push(current);
 
         current = child;
     }

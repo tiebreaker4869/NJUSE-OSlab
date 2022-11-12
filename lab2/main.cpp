@@ -150,7 +150,7 @@ class RootDirEntry {
 bool isLParams(const string &s);
 
 // 检查形如 -[config] 的 token 是否满足 l 的要求
-bool checkParamsL(vector<string>& cmds);
+bool checkParamsL(vector<string>& cmds, bool &isL);
 
 // 检查是否只指定了一个目录, 即只指定了一个，且为目录, 目标目录的 filenode 存到 target .
 bool checkMultipleDirs(vector<string>& cmds, FileNode* &target, FileNode* root);
@@ -342,12 +342,13 @@ bool isLParams(const string &s){
 }
 
 // 检查形如 -[config] 的 token 是否满足 l 的要求
-bool checkParamsL(vector<string>& cmds){
+bool checkParamsL(vector<string>& cmds, bool& isL){
     int len = cmds.size();
 
     for(int i = 1; i < len; i ++){
         if(cmds[i][0] == '-'){
             if(!isLParams(cmds[i]))return false;
+            else isL = true;
         }
     }
 
@@ -557,12 +558,12 @@ void handleLSCmd(vector<string> cmds, FileNode* root){
     int len = cmds.size();
 
     // 此处检查选项是否合法
-    if(!checkParamsL(cmds)){
+    bool isL = false;
+    if(!checkParamsL(cmds, isL)){
         myPrintDefault(LS_CASE);
         myPrintDefault(INVALID_PARAMS);
         return;
     }
-
     FileNode* target = nullptr;
     // 此处检查是否只指定了小于等于一个目录
     if(!checkMultipleDirs(cmds, target, root)){
@@ -572,9 +573,13 @@ void handleLSCmd(vector<string> cmds, FileNode* root){
     }
 
     if(target == nullptr){
-        handleLSL(root);
+        if(isL){
+            handleLSL(root);
+        }else handleLS(root);
     }else {
-        handleLSL(target);
+        if(isL){
+            handleLSL(target);
+        }else handleLS(target);
     }
 
 }

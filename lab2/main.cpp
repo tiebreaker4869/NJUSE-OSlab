@@ -23,6 +23,8 @@ const char* EXIT = "exit.\n";
 
 const char* UNK_CMD = "Unknown commands!\n";
 
+const char* PROMPT = "Usage: 'ls [-l] [dir_path]' or 'cat [file_path]'\n";
+
 int bytePerSector;        // 每个扇区字节数
 int sectorPerCluster;     // 每簇扇区数
 int recordSectorCount;    // boot 记录占用的扇区数
@@ -175,7 +177,7 @@ void handleCAT(vector<string> cmds, FileNode* root);
 FileNode* getFileNodeByPath(vector<string>& pathTokens, FileNode* root);
 
 int main(){
-    const char* fat_path = "./fat.img";
+    const char* fat_path = "./a2.img";
     FILE* fat12 = fopen(fat_path, "rb"); // 打开 FAT12 映像文件
 
     BPB* bpb = new BPB();
@@ -186,6 +188,8 @@ int main(){
 
     RootDirEntry* rootEntry = new RootDirEntry();
     rootEntry->initRootDirArea(fat12, rootNode); 
+
+    myPrintDefault(PROMPT);
 
     while(true){
         myPrintDefault(">");

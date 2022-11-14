@@ -13,6 +13,8 @@ const char* INCORRECT_ARGS_AMOUNT = "Incorrect amount of args is provided!\n";
 
 const char* BAD_CLUSTER = "Bad Cluster!\n";
 
+const char* FILE_NOT_FOUND = "File or directory not found!\n";
+
 const char* LS_CASE = "In ls: ";
 
 const char* CAT_CASE = "In cat: ";
@@ -169,6 +171,8 @@ void doCAT(string filename, FileNode* root);
 void handleLSCmd(vector<string> cmds, FileNode* root);
 
 void handleCAT(vector<string> cmds, FileNode* root);
+
+FileNode* getFileNodeByPath(vector<string>& pathTokens, FileNode* root);
 
 int main(){
     const char* fat_path = "./fat.img";
@@ -385,32 +389,15 @@ bool checkMultipleDirs(vector<string>& cmds, FileNode* &target, FileNode* root){
 
     int pathLen = pathSegs.size();
 
-    FileNode* current = root;
 
     stack<FileNode*> visited;
 
     // 找到目标目录
-    for(int i = 0; i < pathLen; i ++){
-        if(pathSegs[i] == "."){
-            continue;
-        }else if(pathSegs[i] == ".."){
-            if(visited.empty()){
-                continue;
-            }
-            FileNode* parent = visited.top();
-            visited.pop();
-            current = parent;
-            continue;
-        }
-        FileNode* child = current->findChildByName(pathSegs[i]);
-        if(child == nullptr){
-            myPrintDefault("File Not Found!\n");
-            return false;
-        }
-        
-        visited.push(current);
+    FileNode* current = getFileNodeByPath(pathSegs, root);
 
-        current = child;
+    if(current == nullptr){
+        myPrintDefault(FILE_NOT_FOUND);
+        return false;;
     }
 
     // 如果目标是文件, 那么不合法
@@ -600,37 +587,9 @@ void doCAT(string filename, FileNode* root){
     vector<string> pathSegs = tokenize(filename, "/");
     int segLen = pathSegs.size();
 
-    FileNode* current = root;
+    FileNode* current = getFileNodeByPath(pathSegs, root);
 
-    stack<FileNode*> visited;
-
-    for(int i = 0; i < segLen-1; i ++){
-        if(pathSegs[i] == "."){
-            continue;
-        }else if(pathSegs[i] == ".."){
-            if(visited.empty()){
-                continue;
-            }
-            FileNode* parent = visited.top();
-            visited.pop();
-            current = parent;
-            continue;
-        }
-        FileNode* child = current->findChildByName(pathSegs[i]);
-        if(child == nullptr || child->isFile_){
-            myPrintDefault(CAT_CASE);
-            myPrintDefault(INVALID_PARAMS);
-            return;
-        }
-
-        visited.push(current);
-
-        current = child;
-    }
-
-    current = current->findChildByName(pathSegs[segLen-1]);
-
-    if(current == nullptr){
+    if(current == nullptr || !current->isFile_){
         myPrintDefault(CAT_CASE);
         myPrintDefault(INVALID_PARAMS);
         return;
@@ -841,6 +800,37 @@ void RootDirEntry::readChildrenNode(FILE* fat12, uint16_t clusterNumber, FileNod
         // 这个其实不需要，因为目录项只有 32 bytes
         currentCluster = nextCluster;
     }
+}
+
+FileNode* getFileNodeByPath(vector<string> &pathTokens, FileNode* root){
+    FileNode* current = root;
+    stack<FileNode*> visited;
+
+    for(int i = 0; i < pathTokens.size(); i ++){
+        if(pathTokens[i] == "."){
+            continue;
+        }else if(pathTokens[i] == ".."){
+            if(visited.empty()){
+                continue;
+            }
+            FileNode* parent = visited.top();
+            visited.pop();
+            current = parent;
+            continue;
+        }
+
+        FileNode* child = current->findChildByName(pathTokens[i]);
+
+        if(child == nullptr){
+            return nullptr;
+        }
+
+        visited.push(current);
+
+        current = child;
+    }
+
+    return current;
 }
 
 void myPrintDefault(const char* str){

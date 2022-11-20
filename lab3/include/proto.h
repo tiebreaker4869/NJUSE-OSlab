@@ -44,8 +44,6 @@ PUBLIC void in_process(TTY* p_tty, u32 key);
 /* console.c */
 PUBLIC void out_char(CONSOLE* p_con, char ch);
 PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
-PUBLIC void exit_esc(CONSOLE* p_con);
-PUBLIC void search(CONSOLE* p_con);
 
 /* 以下是系统调用相关 */
 

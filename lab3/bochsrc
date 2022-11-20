@@ -22,7 +22,4 @@ boot: a
 mouse: enabled=0
 
 # enable key mapping, using US layout as default.
-keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/sdl-pc-us.map
-
-display_library:sdl
-
+keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-us.map

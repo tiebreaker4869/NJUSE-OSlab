@@ -15,10 +15,12 @@
 #include "global.h"
 #include "proto.h"
 
-
 /*======================================================================*
                             kernel_main
  *======================================================================*/
+
+void cleanScreen();
+
 PUBLIC int kernel_main()
 {
 	disp_str("-----\"kernel_main\" begins-----\n");
@@ -82,12 +84,23 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
+	cleanScreen();
+
 	init_clock();
         init_keyboard();
 
 	restart();
 
 	while(1){}
+}
+
+
+void cleanScreen(){
+	disp_pos = 0;
+	for(int i = 0; i < SCREEN_SIZE; i ++){
+		disp_str(" ");
+	}
+	disp_pos = 0;
 }
 
 /*======================================================================*

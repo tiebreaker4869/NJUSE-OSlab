@@ -85,7 +85,7 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 			if(mode == 0){
 				put_key(p_tty, '\n');
 			}else if(mode == 1){
-				find(p_tty);
+				find(p_tty->p_console);
 				mode = 2;
 			}
 			break;
@@ -106,7 +106,7 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 					}else {
 						mode = 0;
 						//TODO: 清除关键字
-						exit_find_mode(p_tty);
+						exit_find_mode(p_tty->p_console);
 					}
 			break;
                 case UP:

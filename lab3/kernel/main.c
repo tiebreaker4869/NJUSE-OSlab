@@ -108,7 +108,7 @@ void TestA()
 		/* disp_str("A."); */
 		clean_screen();
 		init_all_screens();
-		milli_delay(100000);
+		milli_delay(50000);
 	}
 }
 

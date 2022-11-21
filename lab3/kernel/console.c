@@ -29,6 +29,9 @@ PRIVATE void init_stack(STACK* stk);
 PRIVATE void push(STACK* stk, unsigned pos);
 PRIVATE void pop(STACK* stk);
 PRIVATE int top(STACK* stk);
+PRIVATE void exit_find(STACK* stk);
+PUBLIC void exit_find_mode(CONSOLE* p_con);
+PUBLIC void find(CONSOLE* p_con);
 
 /*======================================================================*
 			   init_screen
@@ -235,6 +238,7 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 
 PRIVATE void init_stack(STACK* stk){
 	stk->esp = 0;
+	stk->find_begin_pos = 0;
 }
 
 PRIVATE void push(STACK* stk, unsigned int pos){
@@ -253,4 +257,58 @@ PRIVATE int top(STACK* stk){
 	}
 
 	return stk->pos[stk->esp];
+}
+
+// 退出搜索模式的时候复位回溯栈
+PRIVATE void exit_find(STACK* stk){
+	stk->esp = stk->find_begin_pos;
+}
+
+// 退出搜索模式的时候复位回溯栈，cursor，清空红色输入
+PUBLIC void exit_find_mode(CONSOLE* p_con){
+	u8* p_vmem = (u8*)(V_MEM_BASE + p_con->cursor * 2);
+
+	int back_step = p_con->cursor - p_con->find_begin_cursor;
+
+	// 清空搜索模式下的红色输入
+	for(int i = 0; i < back_step; i ++){
+		*(p_vmem - 2 - 2*i) = ' ';
+		*(p_vmem - 1 - 2*i) = DEFAULT_CHAR_COLOR;
+	}
+
+	// 复原回溯栈和指针
+	p_con->cursor = p_con->find_begin_cursor;
+	exit_find(&(p_con->backtrace_stack));
+
+	// 恢复白色
+	for(int i=0;i<p_con->find_begin_cursor*2;i+=2){ 
+		*(u8*)(V_MEM_BASE + i + 1) = DEFAULT_CHAR_COLOR;
+	}
+	// 更新 console，参见 outchar
+	flush(p_con);
+}
+
+PUBLIC void find(CONSOLE* p_con){
+	int start, end;
+
+	for(int i = 0; i < p_con->find_begin_cursor*2; i += 2){
+		start = end = i;
+
+		int matched = 1;
+
+		for(int j = p_con->find_begin_cursor*2; j < p_con->cursor*2; j += 2){
+			if(*((u8*)(V_MEM_BASE+end))==*((u8*)(V_MEM_BASE+j))){
+				end+=2;
+			}else{
+				matched = 0;
+				break;
+			}
+		}
+
+		if(matched){
+			for(int j = start; j <= end; j += 2){
+				*(u8*)(V_MEM_BASE + j + 1) = RED;
+			}
+		}
+	}
 }

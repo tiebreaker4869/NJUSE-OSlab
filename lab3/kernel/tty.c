@@ -66,6 +66,15 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 {
         char output[2] = {'\0', '\0'};
 
+		if(mode == 2){
+			if((key & MASK_RAW) == ESC){
+				mode = 0;
+				exit_find_mode(p_tty->p_console);
+			}
+
+			return;
+		}
+
         if (!(key & FLAG_EXT)) {
 		put_key(p_tty, key);
         }
@@ -73,7 +82,12 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
                 int raw_code = key & MASK_RAW;
                 switch(raw_code) {
                 case ENTER:
-			put_key(p_tty, '\n');
+			if(mode == 0){
+				put_key(p_tty, '\n');
+			}else if(mode == 1){
+				find(p_tty);
+				mode = 2;
+			}
 			break;
                 case BACKSPACE:
 			put_key(p_tty, '\b');
@@ -85,9 +99,14 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 					//如果原来模式是正常模式，那么进入搜索模式
 					if(mode == 0){
 						mode = 1;
+						// 记录搜索开始时的一些信息，方便退出的时候清除
+						p_tty->p_console->find_begin_cursor = p_tty->p_console->cursor;
+						p_tty->p_console->backtrace_stack.find_begin_pos = p_tty->p_console->backtrace_stack.esp;
+
 					}else {
 						mode = 0;
 						//TODO: 清除关键字
+						exit_find_mode(p_tty);
 					}
 			break;
                 case UP:

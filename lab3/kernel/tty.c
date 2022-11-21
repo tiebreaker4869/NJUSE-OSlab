@@ -102,7 +102,7 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 						// 记录搜索开始时的一些信息，方便退出的时候清除
 						p_tty->p_console->find_begin_cursor = p_tty->p_console->cursor;
 						p_tty->p_console->backtrace_stack.find_begin_pos = p_tty->p_console->backtrace_stack.esp;
-
+						p_tty->p_console->redo_lst.find_begin_pos = p_tty->p_console->redo_lst.size;
 					}else {
 						mode = 0;
 						//TODO: 清除关键字
@@ -182,6 +182,8 @@ PRIVATE void tty_do_write(TTY* p_tty)
 		}
 		p_tty->inbuf_count--;
 
+		push_to_redo_lst(&(p_tty->p_console->redo_lst), ch);
+		
 		out_char(p_tty->p_console, ch);
 	}
 }

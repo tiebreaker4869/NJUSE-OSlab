@@ -32,6 +32,9 @@ PRIVATE int top(STACK* stk);
 PRIVATE void exit_find(STACK* stk);
 PUBLIC void exit_find_mode(CONSOLE* p_con);
 PUBLIC void find(CONSOLE* p_con);
+PUBLIC void push_to_redo_lst(REDO_LST* redo_lst, char ch);
+PRIVATE void redo_outchar(CONSOLE* p_con);
+PRIVATE void init_redo_lst(REDO_LST* redo_lst);
 
 /*======================================================================*
 			   init_screen
@@ -65,6 +68,9 @@ PUBLIC void init_screen(TTY* p_tty)
 
 	// 初始化回退栈
 	init_stack(&(p_tty->p_console->backtrace_stack));
+
+	// 初始化 redo list
+	init_redo_lst(&(p_tty->p_console->redo_lst));
 }
 
 
@@ -126,6 +132,33 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 		   p_con->cursor += TAB_WIDTH;
 		}
 		break;
+	case 'z':
+	case 'Z':
+		if((ctrl == 1) && (mode < 2)){
+			int clear_begin_pos;
+			
+			if(mode == 0){
+				clear_begin_pos = 0;
+				p_con->backtrace_stack.esp = 0;
+			}else if(mode == 1){
+				clear_begin_pos = p_con->find_begin_cursor * 2;
+				p_con->backtrace_stack.esp = p_con->backtrace_stack.find_begin_pos;
+			}
+			
+			disp_pos = clear_begin_pos;
+			
+			for(int i = 0; i < SCREEN_SIZE; i ++){
+				disp_str(" ");
+			}
+
+			disp_pos = clear_begin_pos;
+			p_con->cursor = disp_pos / 2;
+
+			flush(p_con);
+			redo_outchar(p_con);
+
+			return;
+		}
 	default:
 		if (p_con->cursor <
 		    p_con->original_addr + p_con->v_mem_limit - 1) {
@@ -311,4 +344,27 @@ PUBLIC void find(CONSOLE* p_con){
 			}
 		}
 	}
+}
+
+PUBLIC void push_to_redo_lst(REDO_LST* redo_lst, char ch){
+	redo_lst->arr[redo_lst->size] = ch;
+	redo_lst->size ++;
+}
+
+PRIVATE void redo_outchar(CONSOLE* p_con){
+	p_con->redo_lst.size -= 2;
+
+	if(p_con->redo_lst.size <= 0){
+		p_con->redo_lst.size = 0;
+		return;
+	}
+
+	for(int i = 0; i < p_con->redo_lst.size; i ++){
+		out_char(p_con, p_con->redo_lst.arr[i]);
+	}
+}
+
+PRIVATE void init_redo_lst(REDO_LST* redo_lst){
+	redo_lst->find_begin_pos = 0;
+	redo_lst->size = 0;
 }

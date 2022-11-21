@@ -23,6 +23,12 @@ typedef struct pos_stack {
 	unsigned int find_begin_pos; /*方便 find 模式退出清空*/
 }STACK;
 
+typedef struct redo_list {
+	unsigned int size;
+	char arr[SCREEN_SIZE];
+	unsigned int find_begin_pos;
+}REDO_LST;
+
 /* CONSOLE */
 typedef struct s_console
 {
@@ -32,6 +38,7 @@ typedef struct s_console
 	unsigned int	cursor;			/* 当前光标位置 */
 	unsigned int find_begin_cursor; /*find mode 开始的时候的光标位置，方便 find 模式退出清空*/
 	STACK backtrace_stack;          /* 用来回退的栈 */
+	REDO_LST redo_lst;              /*用来撤销操作的 redo list*/
 }CONSOLE;
 
 

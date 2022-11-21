@@ -47,6 +47,7 @@ PUBLIC void out_char(CONSOLE* p_con, char ch);
 PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 PUBLIC void exit_find_mode(CONSOLE* p_con);
 PUBLIC void find(CONSOLE* p_con);
+PUBLIC void push_to_redo_lst(REDO_LST* redo_lst, char ch);
 
 /* 以下是系统调用相关 */
 

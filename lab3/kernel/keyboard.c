@@ -207,6 +207,8 @@ PUBLIC void keyboard_read(TTY* p_tty)
 				break;
 			}
 
+			ctrl = ctrl_l || ctrl_r;
+
 			if (make) { /* 忽略 Break Code */
 				int pad = 0;
 

@@ -129,7 +129,7 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 			*p_vmem++ = ch;
 			if(mode == 0){
 				*p_vmem++ = DEFAULT_CHAR_COLOR;
-			}else if(mode == 1){
+			}else {
 				*p_vmem++ = RED;
 			}
 

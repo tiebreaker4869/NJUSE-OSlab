@@ -106,9 +106,14 @@ void TestA()
 	int i = 0;
 	while (1) {
 		/* disp_str("A."); */
-		clean_screen();
-		init_all_screens();
-		milli_delay(50000);
+		if(mode == 0){
+			clean_screen();
+			init_all_screens();
+			milli_delay(50000);
+		}else {
+			milli_delay(10);
+		}
+		
 	}
 }
 

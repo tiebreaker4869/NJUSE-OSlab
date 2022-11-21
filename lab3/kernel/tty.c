@@ -81,6 +81,16 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 				case TAB:
 			put_key(p_tty, '\t');
 			break;
+				case ESC:
+					//如果原来模式是正常模式，那么进入搜索模式
+					if(mode == 0){
+						mode = 1;
+					}else if(mode == 1){
+						mode = 0;
+						//TODO: 清除关键字
+
+					}
+			break;
                 case UP:
                         if ((key & FLAG_SHIFT_L) || (key & FLAG_SHIFT_R)) {
 				scroll_screen(p_tty->p_console, SCR_DN);

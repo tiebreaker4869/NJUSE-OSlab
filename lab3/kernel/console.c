@@ -90,6 +90,16 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 			*(p_vmem-1) = DEFAULT_CHAR_COLOR;
 		}
 		break;
+	case '\t':
+		if(p_con->cursor < p_con->original_addr + 
+		   p_con->v_mem_limit - TAB_WIDTH){
+			   for(int i = 0; i < TAB_WIDTH; i ++){
+				   *p_vmem++ = ' ';
+				   *p_vmem++ = DEFAULT_CHAR_COLOR;
+			   }
+		   p_con->cursor += TAB_WIDTH;
+		}
+		break;
 	default:
 		if (p_con->cursor <
 		    p_con->original_addr + p_con->v_mem_limit - 1) {

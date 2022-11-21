@@ -42,4 +42,4 @@ PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks};
 0: 正常模式，
 1：搜索模式
 */
-PUBLIC int mode = 0;
+PUBLIC int mode;

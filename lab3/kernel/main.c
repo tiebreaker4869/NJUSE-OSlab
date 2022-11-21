@@ -87,6 +87,8 @@ PUBLIC int kernel_main()
 
 	clean_screen();
 
+	mode = 0;
+
 	init_clock();
         init_keyboard();
 

@@ -85,10 +85,9 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 					//如果原来模式是正常模式，那么进入搜索模式
 					if(mode == 0){
 						mode = 1;
-					}else if(mode == 1){
+					}else {
 						mode = 0;
 						//TODO: 清除关键字
-
 					}
 			break;
                 case UP:

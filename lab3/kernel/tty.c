@@ -24,6 +24,9 @@ PRIVATE void tty_do_read(TTY* p_tty);
 PRIVATE void tty_do_write(TTY* p_tty);
 PRIVATE void put_key(TTY* p_tty, u32 key);
 
+
+PUBLIC void init_all_screens();
+
 /*======================================================================*
                            task_tty
  *======================================================================*/
@@ -156,3 +159,15 @@ PRIVATE void tty_do_write(TTY* p_tty)
 }
 
 
+/*======================================================================*
+			      my additional functions
+ *======================================================================*/
+
+PUBLIC void init_all_screens(){
+	TTY *p_tty;
+	for(p_tty=TTY_FIRST; p_tty < TTY_END; p_tty ++){
+		init_screen(p_tty);
+	}
+
+	select_console(0);
+}

@@ -19,7 +19,8 @@
                             kernel_main
  *======================================================================*/
 
-void cleanScreen();
+void clean_screen();
+
 
 PUBLIC int kernel_main()
 {
@@ -84,7 +85,7 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
-	cleanScreen();
+	clean_screen();
 
 	init_clock();
         init_keyboard();
@@ -95,13 +96,7 @@ PUBLIC int kernel_main()
 }
 
 
-void cleanScreen(){
-	disp_pos = 0;
-	for(int i = 0; i < SCREEN_SIZE; i ++){
-		disp_str(" ");
-	}
-	disp_pos = 0;
-}
+
 
 /*======================================================================*
                                TestA
@@ -111,7 +106,9 @@ void TestA()
 	int i = 0;
 	while (1) {
 		/* disp_str("A."); */
-		milli_delay(10);
+		clean_screen();
+		init_all_screens();
+		milli_delay(100000);
 	}
 }
 
@@ -128,7 +125,7 @@ void TestB()
 }
 
 /*======================================================================*
-                               TestB
+                               TestC
  *======================================================================*/
 void TestC()
 {
@@ -138,3 +135,17 @@ void TestC()
 		milli_delay(10);
 	}
 }
+
+
+/*======================================================================*
+                               my additional functions
+ *======================================================================*/
+
+void clean_screen(){
+	disp_pos = 0;
+	for(int i = 0; i < SCREEN_SIZE; i ++){
+		disp_str(" ");
+	}
+	disp_pos = 0;
+}
+

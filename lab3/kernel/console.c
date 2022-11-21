@@ -305,7 +305,7 @@ PUBLIC void find(CONSOLE* p_con){
 			}
 		}
 
-		if(matched){
+		if(matched == 1){
 			for(int j = start; j <= end; j += 2){
 				*(u8*)(V_MEM_BASE + j + 1) = RED;
 			}

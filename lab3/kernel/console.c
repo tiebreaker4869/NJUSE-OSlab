@@ -25,6 +25,10 @@
 PRIVATE void set_cursor(unsigned int position);
 PRIVATE void set_video_start_addr(u32 addr);
 PRIVATE void flush(CONSOLE* p_con);
+PRIVATE void init_stack(STACK* stk);
+PRIVATE void push(STACK* stk, unsigned pos);
+PRIVATE void pop(STACK* stk);
+PRIVATE int top(STACK* stk);
 
 /*======================================================================*
 			   init_screen
@@ -55,6 +59,9 @@ PUBLIC void init_screen(TTY* p_tty)
 	}
 
 	set_cursor(p_tty->p_console->cursor);
+
+	// 初始化回退栈
+	init_stack(&(p_tty->p_console->backtrace_stack));
 }
 
 
@@ -78,6 +85,9 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 	case '\n':
 		if (p_con->cursor < p_con->original_addr +
 		    p_con->v_mem_limit - SCREEN_WIDTH) {
+
+			push(&(p_con->backtrace_stack), p_con->cursor);
+
 			p_con->cursor = p_con->original_addr + SCREEN_WIDTH * 
 				((p_con->cursor - p_con->original_addr) /
 				 SCREEN_WIDTH + 1);
@@ -85,9 +95,19 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 		break;
 	case '\b':
 		if (p_con->cursor > p_con->original_addr) {
-			p_con->cursor--;
-			*(p_vmem-2) = ' ';
-			*(p_vmem-1) = DEFAULT_CHAR_COLOR;
+			// p_con->cursor--;
+			// *(p_vmem-2) = ' ';
+			// *(p_vmem-1) = DEFAULT_CHAR_COLOR;
+			int back_pos = top(&(p_con->backtrace_stack));
+			pop(&(p_con->backtrace_stack));
+			if(back_pos != -1){
+				int back_step = p_con->cursor - back_pos;
+				for(int i = 0; i < back_step; i ++){
+					*(p_vmem-2-2*i) = ' ';
+					*(p_vmem-1-2*i) = DEFAULT_CHAR_COLOR;
+				}
+				p_con->cursor = back_pos;
+			}
 		}
 		break;
 	case '\t':
@@ -97,6 +117,9 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 				   *p_vmem++ = ' ';
 				   *p_vmem++ = DEFAULT_CHAR_COLOR;
 			   }
+		   
+		   push(&(p_con->backtrace_stack), p_con->cursor);
+		   
 		   p_con->cursor += TAB_WIDTH;
 		}
 		break;
@@ -105,6 +128,9 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 		    p_con->original_addr + p_con->v_mem_limit - 1) {
 			*p_vmem++ = ch;
 			*p_vmem++ = DEFAULT_CHAR_COLOR;
+
+			push(&(p_con->backtrace_stack), p_con->cursor);
+			
 			p_con->cursor++;
 		}
 		break;
@@ -199,3 +225,28 @@ PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
 	set_cursor(p_con->cursor);
 }
 
+/*======================================================================*
+			   my additional functions
+ *======================================================================*/
+
+PRIVATE void init_stack(STACK* stk){
+	stk->esp = 0;
+}
+
+PRIVATE void push(STACK* stk, unsigned int pos){
+	stk->esp ++;
+	stk->pos[stk->esp] = pos;
+}
+
+PRIVATE void pop(STACK* stk){
+	if(stk->esp > 0)
+		stk->esp --;
+}
+
+PRIVATE int top(STACK* stk){
+	if(stk->esp <= 0){
+		return -1;
+	}
+
+	return stk->pos[stk->esp];
+}

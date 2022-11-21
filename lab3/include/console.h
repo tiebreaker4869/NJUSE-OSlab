@@ -8,6 +8,10 @@
 #ifndef _ORANGES_CONSOLE_H_
 #define _ORANGES_CONSOLE_H_
 
+typedef struct pos_stack {
+	unsigned int esp;
+	unsigned int pos[SCREEN_SIZE];
+}STACK;
 
 /* CONSOLE */
 typedef struct s_console
@@ -16,6 +20,7 @@ typedef struct s_console
 	unsigned int	original_addr;		/* 当前控制台对应显存位置 */
 	unsigned int	v_mem_limit;		/* 当前控制台占的显存大小 */
 	unsigned int	cursor;			/* 当前光标位置 */
+	STACK backtrace_stack;          /* 用来回退的栈 */
 }CONSOLE;
 
 #define SCR_UP	1	/* scroll forward */

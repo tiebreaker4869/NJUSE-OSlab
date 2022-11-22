@@ -124,7 +124,7 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 		   p_con->v_mem_limit - TAB_WIDTH){
 			   for(int i = 0; i < TAB_WIDTH; i ++){
 				   *p_vmem++ = ' ';
-				   *p_vmem++ = DEFAULT_CHAR_COLOR;
+				   *p_vmem++ = BLUE;
 			   }
 		   
 		   push(&(p_con->backtrace_stack), p_con->cursor);
@@ -330,7 +330,22 @@ PUBLIC void find(CONSOLE* p_con){
 		int matched = 1;
 
 		for(int j = p_con->find_begin_cursor*2; j < p_con->cursor*2; j += 2){
-			if(*((u8*)(V_MEM_BASE+end))==*((u8*)(V_MEM_BASE+j))){
+			if(*((u8*)(V_MEM_BASE+end))==' '){
+				if(*((u8*)(V_MEM_BASE+j))!=' '){
+					matched = 0 ;
+					break;
+				}
+				if(*((u8*)(V_MEM_BASE+end+1))==BLUE){ // 如果是TAB
+					if(*((u8*)(V_MEM_BASE+j+1))==BLUE){
+						end+=2;
+					}else{
+						matched = 0;
+						break;
+					}
+				}else{ // 普通空格
+					end+=2;
+				}
+			}else if(*((u8*)(V_MEM_BASE+end))==*((u8*)(V_MEM_BASE+j))){
 				end+=2;
 			}else{
 				matched = 0;
@@ -352,14 +367,23 @@ PUBLIC void push_to_redo_lst(REDO_LST* redo_lst, char ch){
 }
 
 PRIVATE void redo_outchar(CONSOLE* p_con){
+	int begin;
+
+	if(mode == 0){
+		begin = 0;
+	}else if(mode == 1){
+		begin = p_con->redo_lst.find_begin_pos;
+	}
+
 	p_con->redo_lst.size -= 2;
 
-	if(p_con->redo_lst.size <= 0){
-		p_con->redo_lst.size = 0;
+	if(p_con->redo_lst.size <= begin){
+		p_con->redo_lst.size = begin;
+
 		return;
 	}
 
-	for(int i = 0; i < p_con->redo_lst.size; i ++){
+	for(int i = begin; i < p_con->redo_lst.size; i ++ ){
 		out_char(p_con, p_con->redo_lst.arr[i]);
 	}
 }

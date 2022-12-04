@@ -1,3 +1,22 @@
+/*
+检查点指路:
+
+清屏: main.c -> clean_screen
+
+TAB 输入的支持: tty.c -> in_process
+
+支持统一删除 TAB ， \n: 加入了 pos_stack 数据结构，在 console.h 中定义
+
+定时清屏: main.c -> TestA 
+
+查找模式: tty.c -> in_process 加入切换查找模式和退出，console.c 中 out_char 加入标红查找字符
+
+退出查找模式: console.c -> exit_find_mode
+
+撤销: keyboard_read 中加入了对 ctrl 的识别，console.h 加入数据结构 redo_lst
+*/
+
+
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                             main.c

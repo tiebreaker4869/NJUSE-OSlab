@@ -104,8 +104,9 @@ PUBLIC void in_process(TTY* p_tty, u32 key)
 						p_tty->p_console->backtrace_stack.find_begin_pos = p_tty->p_console->backtrace_stack.esp;
 						p_tty->p_console->redo_lst.find_begin_pos = p_tty->p_console->redo_lst.size;
 					}else {
+						// 已经在搜索模式，esc 退出
 						mode = 0;
-						//TODO: 清除关键字
+						
 						exit_find_mode(p_tty->p_console);
 					}
 			break;

@@ -23,7 +23,7 @@ typedef struct pos_stack {
 	unsigned int find_begin_pos; /*方便 find 模式退出清空*/
 }STACK;
 
-typedef struct redo_list {
+typedef struct redo_list { /* 方便进行撤销 */
 	unsigned int size;
 	char arr[SCREEN_SIZE];
 	unsigned int find_begin_pos;

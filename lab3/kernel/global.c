@@ -41,7 +41,12 @@ PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_get_ticks};
 模式
 0: 正常模式，
 1：搜索模式
-2: ESC + ENTER
+2: 搜索模式 + 按了回车
 */
 PUBLIC int mode;
+
+/*
+0: 没按 ctrl
+1: 按了 ctrl
+*/
 PUBLIC int ctrl;

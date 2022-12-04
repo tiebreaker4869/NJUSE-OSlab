@@ -110,11 +110,14 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 			int back_pos = top(&(p_con->backtrace_stack));
 			pop(&(p_con->backtrace_stack));
 			if(back_pos != -1){
+				// 把删除的内容用空格覆盖
 				int back_step = p_con->cursor - back_pos;
 				for(int i = 0; i < back_step; i ++){
 					*(p_vmem-2-2*i) = ' ';
 					*(p_vmem-1-2*i) = DEFAULT_CHAR_COLOR;
 				}
+
+				// 移动光标
 				p_con->cursor = back_pos;
 			}
 		}
@@ -274,6 +277,7 @@ PRIVATE void init_stack(STACK* stk){
 	stk->find_begin_pos = 0;
 }
 
+// 在 cursor 移动之前 push 位置
 PRIVATE void push(STACK* stk, unsigned int pos){
 	stk->esp ++;
 	stk->pos[stk->esp] = pos;

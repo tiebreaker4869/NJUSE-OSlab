@@ -85,12 +85,15 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
-	clean_screen();
+	// 上面的代码做一些进程相关的初始化
+
+	clean_screen(); // 清屏，光标移到最前面
 
 	mode = 0;
 	ctrl = 0;
 
-	init_clock();
+	// 初始化时钟中断和键盘中断
+	init_clock(); 
         init_keyboard();
 
 	restart();
@@ -150,6 +153,7 @@ void TestC()
  *======================================================================*/
 
 void clean_screen(){
+	// 整个屏幕打满空格，光标移到最开始
 	disp_pos = 0;
 	for(int i = 0; i < SCREEN_SIZE; i ++){
 		disp_str(" ");

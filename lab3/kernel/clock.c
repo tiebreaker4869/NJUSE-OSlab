@@ -28,6 +28,8 @@ PUBLIC void clock_handler(int irq)
 		return;
 	}
 
+        // 时间片还没用完
+
 	if (p_proc_ready->ticks > 0) {
 		return;
 	}

@@ -108,7 +108,13 @@ PUBLIC void out_char(CONSOLE* p_con, char ch)
 			// *(p_vmem-2) = ' ';
 			// *(p_vmem-1) = DEFAULT_CHAR_COLOR;
 			int back_pos = top(&(p_con->backtrace_stack));
+			
+			if(mode == 1 && back_pos < p_con->backtrace_stack.find_begin_pos){
+				break;
+			}
+
 			pop(&(p_con->backtrace_stack));
+
 			if(back_pos != -1){
 				// 把删除的内容用空格覆盖
 				int back_step = p_con->cursor - back_pos;

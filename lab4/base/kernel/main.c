@@ -104,7 +104,6 @@ void TestA()
 {
 	int i = 0;
 	while (1) {
-		printf("<Ticks:%x>", get_ticks());
 		milli_delay(200);
 	}
 }
@@ -116,7 +115,6 @@ void TestB()
 {
 	int i = 0x1000;
 	while(1){
-		printf("B");
 		milli_delay(200);
 	}
 }
@@ -128,7 +126,6 @@ void TestC()
 {
 	int i = 0x2000;
 	while(1){
-		printf("C");
 		milli_delay(200);
 	}
 }

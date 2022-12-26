@@ -8,9 +8,11 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "proto.h"
+#include "tty.h"
+#include "console.h"
 #include "proc.h"
 #include "global.h"
+#include "proto.h"
 
 
 /* 本文件内函数声明 */
@@ -175,7 +177,7 @@ PUBLIC void init_prot()
 	int i;
 	PROCESS* p_proc	= proc_table;
 	u16 selector_ldt = INDEX_LDT_FIRST << 3;
-	for(i=0;i<NR_TASKS;i++){
+	for (i = 0; i < NR_TASKS+NR_PROCS; i++){
 		init_descriptor(&gdt[selector_ldt>>3],
 				vir2phys(seg2phys(SELECTOR_KERNEL_DS),
 					proc_table[i].ldts),

@@ -43,3 +43,8 @@ PUBLIC  int     sys_get_ticks();        /* sys_call */
 PUBLIC  void    sys_call();             /* int_handler */
 PUBLIC  int     get_ticks();
 
+/*自定义系统调用*/
+PUBLIC void sys_print(char* s);
+
+/*自定义函数*/
+PUBLIC void my_print(char* s);

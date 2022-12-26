@@ -342,6 +342,7 @@ sys_call:
         call    save
 
         sti
+		push ecx
 
         call    [sys_call_table + eax * 4]
         mov     [esi + EAXREG - P_STACKBASE], eax

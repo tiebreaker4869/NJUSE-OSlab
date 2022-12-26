@@ -48,3 +48,34 @@ PUBLIC int sys_get_ticks()
 	return ticks;
 }
 
+/*======================================================================*
+                           自定义系统调用: sys_print
+ *======================================================================*/
+
+PUBLIC void sys_print(char* s) {
+	int offset = p_proc_ready - proc_table;
+	switch (offset)
+	{
+	case 0:
+		disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, RED));
+		break;
+	case 1:
+		disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, GREEN));
+		break;
+	case 2:
+		disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, BLUE));
+		break;
+	case 5:
+		disp_str(s);
+		break;
+	case 4:
+		disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, PURPLE));
+		break;
+	case 3:
+		disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, YELLO));
+		break;
+	default:
+		disp_str(s);
+		break;
+	}
+}

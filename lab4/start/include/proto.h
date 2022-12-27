@@ -45,6 +45,7 @@ PUBLIC  int     get_ticks();
 
 /*自定义系统调用*/
 PUBLIC void sys_print(char* s);
+PUBLIC void sys_sleep(int milli_seconds);
 
 /*自定义函数*/
 PUBLIC void my_print(char* s);

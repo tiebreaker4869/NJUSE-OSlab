@@ -11,6 +11,11 @@
 #define	EXTERN
 #endif
 
+typedef struct semaphore {
+    int value;
+    PROCESS* wake_queue[NR_TASKS];
+} Semaphore;
+
 EXTERN	int		ticks;
 
 EXTERN	int		disp_pos;

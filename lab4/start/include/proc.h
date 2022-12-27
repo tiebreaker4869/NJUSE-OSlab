@@ -36,6 +36,10 @@ typedef struct s_proc {
 
         int ticks;                 /* remained ticks */
         int priority;
+		int wake; 					/*睡醒的时刻*/
+		int demand_time;			/*需要的时间片*/
+		int is_done;				/*是否结束*/
+		int is_block;				/*是否阻塞*/
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */

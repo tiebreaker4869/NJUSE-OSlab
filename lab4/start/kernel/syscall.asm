@@ -12,9 +12,12 @@ INT_VECTOR_SYS_CALL equ 0x90
 
 _NR_print			equ 1
 
+_NR_sleep			equ 2
+
 ; 导出符号
 global	get_ticks
 global	print
+global sleep
 
 bits 32
 [section .text]
@@ -32,6 +35,15 @@ get_ticks:
 ; ====================================================================
 print:
 	mov	eax, _NR_myprint
+	mov ecx,[esp+4]
+	int	INT_VECTOR_SYS_CALL
+	ret
+
+; ====================================================================
+;                              sleep
+; ====================================================================
+sleep:
+	mov	eax, _NR_sleep
 	mov ecx,[esp+4]
 	int	INT_VECTOR_SYS_CALL
 	ret

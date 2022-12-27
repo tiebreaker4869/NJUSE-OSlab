@@ -11,7 +11,8 @@ _NR_get_ticks       equ 0 ; 要跟 global.c 中 sys_call_table 的定义相对�
 _NR_myprint      	equ 1 ; 
 _NR_mysleep      	equ 2 ; 
 _NR_p      	equ 3 ; 
-_NR_v      	equ 4 ; 
+_NR_v      	equ 4 ;
+_NR_myprint_int equ 5
 INT_VECTOR_SYS_CALL equ 0x90
 
 ; 导出符号
@@ -20,6 +21,7 @@ global	myprint
 global	mysleep
 global	P
 global	V
+global myprint_int
 
 bits 32
 [section .text]
@@ -54,3 +56,8 @@ V:
 	int INT_VECTOR_SYS_CALL
 	ret
 
+myprint_int:
+	mov eax,_NR_myprint_int
+	mov ecx,[esp+4]
+	int INT_VECTOR_SYS_CALL
+	ret

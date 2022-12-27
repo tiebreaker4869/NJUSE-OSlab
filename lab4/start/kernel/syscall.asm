@@ -18,6 +18,7 @@ _NR_P				equ 3
 
 _NR_V				equ 4
 
+
 ; 导出符号
 global	get_ticks
 global	print

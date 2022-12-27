@@ -45,3 +45,6 @@ EXTERN int writer_limit;    // 允许同时写的个数，默认为1
 EXTERN int read_prepared_count;
 EXTERN int read_count;   // 正在读的个数
 EXTERN int solve_hunger; // 是否解决饿死
+EXTERN int print_index; // 输出的序号
+
+PUBLIC PROCESS* pre_proc;

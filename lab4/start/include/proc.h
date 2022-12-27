@@ -40,7 +40,8 @@ typedef struct s_proc {
 		int demand_time;			/*需要的时间片*/
 		int is_done;				/*是否结束*/
 		int is_block;				/*是否阻塞*/
-		char type;					/*读者进程还是写者进程, 读者进程: r, 写者进程: w*/
+		char type;					/*读者进程还是写者进程, 读者进程: r, 写者进程: w, 输出进程: o*/
+        int task_status;            /*正在进行的任务的状态, 正在等待: 0, 正在进行: 1, 休息: 2*/
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
@@ -54,14 +55,20 @@ typedef struct s_task {
 
 
 /* Number of tasks */
-#define NR_TASKS	3
+#define NR_TASKS	6
 
 /* stacks of tasks */
-#define STACK_SIZE_TESTA	0x8000
-#define STACK_SIZE_TESTB	0x8000
-#define STACK_SIZE_TESTC	0x8000
+#define STACK_SIZE_A	0x8000
+#define STACK_SIZE_B	0x8000
+#define STACK_SIZE_C	0x8000
+#define STACK_SIZE_D	0x8000
+#define STACK_SIZE_E	0x8000
+#define STACK_SIZE_F	0x8000
 
-#define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA + \
-				STACK_SIZE_TESTB + \
-				STACK_SIZE_TESTC)
+#define STACK_SIZE_TOTAL	(STACK_SIZE_A + \
+				STACK_SIZE_B + \
+				STACK_SIZE_C + \
+                STACK_SIZE_D + \
+                STACK_SIZE_E + \
+                STACK_SIZE_F)
 

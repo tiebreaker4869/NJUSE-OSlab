@@ -158,6 +158,12 @@ void F()
 
         myprint(s);
 
+        for (int i = 0; i < NR_TASKS - 1; i ++) {
+            PROCESS* cur_process = proc_table + i;
+            char ptype[3] = {cur_process->type, , ' ', '\0'};
+            print(ptype);
+        }
+
         myprint("\n");
 
         print_index ++;

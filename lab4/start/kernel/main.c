@@ -14,6 +14,46 @@
 #include "global.h"
 
 
+PUBLIC init_task() {
+    p_proc_ready = proc_table;
+
+    proc_table[0].priority = 100;
+
+    proc_table[1].priority = 90;
+
+    proc_table[2].priority = 80;
+
+    proc_table[3].priority = 95;
+
+    proc_table[4].priority = 90;
+
+    proc_table[5].priority = 80;
+
+    proc_table[0].demand_time = 1;
+
+    proc_table[1].demand_time = 2;
+
+    proc_table[2].demand_time = 3;
+
+    proc_table[3].demand_time = 3;
+
+    proc_table[4].demand_time = 3;
+
+    proc_table[5].demand_time = 4;
+
+    /*初始化信号量相关*/
+    reader_limit = 3;
+    read_mutex.value = reader_limit;
+    writer_limit = 1;
+    write_mutex.value = writer_limit;
+    count_mutex.value = 1;
+    write_mutex_mutex.value = 1;
+
+    // 是否需要解决饿死
+    solve_hunger = 0;
+}
+
+
 /*======================================================================*
                             kernel_main
  *======================================================================*/
@@ -60,14 +100,12 @@ PUBLIC int kernel_main() {
         selector_ldt += 1 << 3;
     }
 
-    proc_table[0].ticks = proc_table[0].priority = 150; /* 0x96 */
-    proc_table[1].ticks = proc_table[1].priority = 50; /* 0x32 */
-    proc_table[2].ticks = proc_table[2].priority = 30; /* 0x1E */
 
     k_reenter = 0;
     ticks = 0;
 
-    p_proc_ready = proc_table;
+
+    init_task();
 
     /* 初始化 8253 PIT */
     out_byte(TIMER_MODE, RATE_GENERATOR);

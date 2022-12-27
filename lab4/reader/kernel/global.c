@@ -34,8 +34,7 @@ PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks,
                                                     sys_myprint,
                                                     sys_sleep,
                                                     sys_p,
-                                                    sys_v,
-                                                    myprint_int};
+                                                    sys_v};
 
 
 PUBLIC char writeStr[] = " writing.";

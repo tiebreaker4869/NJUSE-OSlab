@@ -64,14 +64,6 @@ PUBLIC void sys_myprint(char *s)
 }
 
 /*======================================================================*
-                           sys_myprint_int
- *======================================================================*/
-PUBLIC void sys_myprint_int(int x)
-{
-    disp_int(x);
-}
-
-/*======================================================================*
                            sys_sleep
  *======================================================================*/
 PUBLIC void sys_sleep(int milli_seconds)
@@ -152,6 +144,5 @@ void check(){
 		for (p = proc_table; p < proc_table + NR_TASKS-1; p++){
 			p->isDone = 0;
 		}
-		disp_str("<RESTART> ");
 	}
 }

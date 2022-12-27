@@ -146,7 +146,17 @@ void F()
             continue;
         }
 
-        myprint_int(print_index);
+        char* s;
+
+        if (print_index < 10) {
+            char index[2] = {'0' + print_index, '\0'};
+            s = index;
+        } else {
+            char index[3] = {'0' + print_index / 10, '0' + print_index % 10, '\0'};
+            s = index;
+        }
+
+        myprint(s);
 
         myprint("\n");
 

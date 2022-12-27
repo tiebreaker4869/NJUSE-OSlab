@@ -42,12 +42,13 @@ PUBLIC  int     sys_get_ticks();        /* sys_call */
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */
 PUBLIC  int     get_ticks();
+PUBLIC void print(char* s);
+PUBLIC void sleep(int milli_seconds);
+PUBLIC void P(void* mutex);
+PUBLIC void V(void* mutex);
 
-/*自定义系统调用*/
+/*自定义的函数, 在 proc.c*/
 PUBLIC void sys_print(char* s);
 PUBLIC void sys_sleep(int milli_seconds);
 PUBLIC void sys_P(void* mutex);
 PUBLIC void sys_V(void* mutex);
-
-/*自定义函数*/
-PUBLIC void my_print(char* s);

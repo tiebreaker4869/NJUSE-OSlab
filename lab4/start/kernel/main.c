@@ -121,9 +121,10 @@ void TestB()
 void TestC()
 {
 	int i = 0x2000;
-	while(1){
+	while (1) {
 		disp_color_str("C.", BRIGHT | MAKE_COLOR(BLACK, RED));
 		disp_int(get_ticks());
 		milli_delay(200);
 	}
 }
+

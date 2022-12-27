@@ -11,16 +11,6 @@
 #define	EXTERN
 #endif
 
-typedef struct semaphore {
-    int value;
-    PROCESS* wait_queue[NR_TASKS];
-} Semaphore;
-
-EXTERN Semaphore rmutex; // init_value = 1
-EXTERN Semaphore wmutex; // init_value = 1
-EXTERN Semaphore S; // init_value = 1
-EXTERN Semaphore reader_count_mutex; // 限制读者数量的信号量, init_value = 读者并发数
-
 EXTERN	int		ticks;
 
 EXTERN	int		disp_pos;
@@ -38,4 +28,9 @@ extern	PROCESS		proc_table[];
 extern	char		task_stack[];
 extern  TASK            task_table[];
 extern	irq_handler	irq_table[];
+
+typedef struct semaphore {
+    int value;
+    PROCESS* wait_queue[NR_TASKS];
+} Semaphore;
 

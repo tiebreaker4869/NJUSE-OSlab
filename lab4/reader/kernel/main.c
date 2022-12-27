@@ -145,7 +145,7 @@ void F()
 	while (1)
 	{
         if (print_index > 20) {
-            mysleep(10);
+            mysleep(TIME_SLICE);
             continue;
         }
 
@@ -187,13 +187,13 @@ void F()
 
         print_index ++;
 
-		mysleep(10);
+		mysleep(TIME_SLICE);
 	}
 }
 
 void reader(char process)
 {
-    mysleep(10);
+    mysleep(TIME_SLICE);
     int current_index = process - 'A';
 	while (1)
 	{
@@ -210,18 +210,7 @@ void reader(char process)
 		P(&readMutex);
         task_status[current_index] = 0;
 		readCount++;
-		int j;
-		for (j = 0; j < p_proc_ready->needTime; ++j)
-		{
-			if (j == p_proc_ready->needTime - 1)
-			{
-
-			}
-			else
-			{
-				milli_delay(10);
-			}
-		}
+		milli_delay(p_proc_ready->needTime * TIME_SLICE);
 		readCount--;
 		V(&readMutex);
 
@@ -235,7 +224,7 @@ void reader(char process)
 		V(&countMutex);
 
 		p_proc_ready->isDone = solveHunger;
-		milli_delay(10); // 废弃当前时间片，至少等到下个时间片才能进入循环
+		mysleep(TIME_SLICE); // 废弃当前时间片，至少等到下个时间片才能进入循环
 	}
 }
 
@@ -248,23 +237,12 @@ void writer(char process)
 		P(&writeMutexMutex); // 只允许一个写者进程在writeMutex排队，其他写者进程只能在writeMutexMutex排队
 		P(&writeMutex);
         task_status[current_index] = 0;
-		int j;
-		for (j = 0; j < p_proc_ready->needTime; ++j)
-		{
-			if (j == p_proc_ready->needTime - 1)
-			{
-
-			}
-			else
-			{
-				milli_delay(10);
-			}
-		}
+		milli_delay(p_proc_ready->needTime * TIME_SLICE);
         task_status[current_index] = 2;
 		V(&writeMutex);
 		V(&writeMutexMutex);
 
 		p_proc_ready->isDone = solveHunger;
-		milli_delay(10);
+		mysleep(TIME_SLICE);
 	}
 }

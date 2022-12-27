@@ -40,6 +40,7 @@ typedef struct s_proc
 	int isBlock;		// 1，被阻塞；0.非阻塞
 	int isDone;			// 1，已完成；0，未完成
 	char type;			// 'r'/'w'
+    int taskStatus;
 	u32 pid;		 /* process id passed in from MM */
 	char p_name[16]; /* name of the process */
 } PROCESS;

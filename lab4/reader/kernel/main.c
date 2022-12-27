@@ -66,6 +66,10 @@ PUBLIC int kernel_main()
 	proc_table[4].ticks = proc_table[4].needTime = 4;
 	proc_table[5].ticks = proc_table[5].needTime = 1;
 
+    for (int i = 0; i < NR_TASKS - 1; i ++) {
+        proc_table[i].taskStatus = 2;
+    }
+
 	k_reenter = 0;
 	ticks = 0;
 
@@ -158,10 +162,27 @@ void F()
 
         myprint(s);
 
+        myprint(" ");
+
         for (int i = 0; i < NR_TASKS - 1; i ++) {
             PROCESS* cur_process = proc_table + i;
-            char ptype[3] = {cur_process->type , ' ', '\0'};
-            myprint(ptype);
+            switch (cur_process->taskStatus) {
+                case 0:
+                    // 正在
+                    myprint("O");
+                    break;
+                case 1:
+                    // 等待
+                    myprint("X");
+                    break;
+                case 2:
+                    // 休息
+                    myprint("Z");
+                    break;
+                default:
+                    break;
+            }
+            myprint(" ");
         }
 
         myprint("\n");

@@ -35,8 +35,3 @@ PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks,
                                                     sys_sleep,
                                                     sys_p,
                                                     sys_v};
-
-
-PUBLIC char writeStr[] = " writing.";
-PUBLIC char readStr[] = " reading.";
-PUBLIC char endStr[] = " end.    ";

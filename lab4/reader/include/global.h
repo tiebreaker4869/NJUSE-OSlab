@@ -50,8 +50,3 @@ EXTERN int solveHunger; // 是否解决饿死
 EXTERN char nowStatus;
 
 EXTERN int print_index;
-
-
-EXTERN char writeStr[];
-EXTERN char readStr[];
-EXTERN char endStr[];

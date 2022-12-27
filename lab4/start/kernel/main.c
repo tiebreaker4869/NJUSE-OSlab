@@ -110,7 +110,6 @@ PUBLIC int kernel_main() {
 
     p_proc_ready = proc_table;
 
-
     init_task();
 
     /* 初始化 8253 PIT */

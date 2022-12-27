@@ -76,7 +76,7 @@ PUBLIC int kernel_main()
 	p_proc_ready = proc_table;
 
 	/*初始化信号量相关*/
-	readNum = 1;
+	readNum = 3;
 	readMutex.value = readNum;
 	writeNum = 1;
 	writeMutex.value = writeNum;

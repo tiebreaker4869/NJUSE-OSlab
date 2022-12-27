@@ -82,6 +82,9 @@ PUBLIC int kernel_main()
 	// 是否需要解决饿死
 	solveHunger = 0;
 
+    // 输出序号
+    print_index = 1;
+
 	/* 初始化 8253 PIT */
 	out_byte(TIMER_MODE, RATE_GENERATOR);
 	out_byte(TIMER0, (u8)(TIMER_FREQ / HZ));
@@ -138,21 +141,15 @@ void F()
 {
 	while (1)
 	{
-		if (nowStatus == 'r')
-		{
-			printColorStr("<read==", 'F');
-			char num = '0' + readCount - 0;
-			char tem[4] = {num, '>', ' ', '\0'};
-			printColorStr(tem, 'w');
-		}
-		else if (nowStatus == 'w')
-		{
-			printColorStr("<writing> ", 'F');
-		}
-		else
-		{
-			printColorStr("<<START>> ", 'F');
-		}
+        if (print_index > 20) {
+            mysleep(10);
+            continue;
+        }
+
+        myprint("this is output process\n");
+
+        print_index ++;
+
 		mysleep(10);
 	}
 }
@@ -160,7 +157,6 @@ void F()
 void reader(char process)
 {
 	mysleep(10);
-	char pname[2] = {process, '\0'};
 	while (1)
 	{
 		// 判断修改在读人数
@@ -174,17 +170,12 @@ void reader(char process)
 
 		P(&readMutex);
 		readCount++;
-		printColorStr(pname, process);
-		printColorStr(" start.  ", process);
 		int j;
 		for (j = 0; j < p_proc_ready->needTime; ++j)
 		{
-			printColorStr(pname, process);
-			printColorStr(readStr, process);
 			if (j == p_proc_ready->needTime - 1)
 			{
-				printColorStr(pname, process);
-				printColorStr(endStr, process);
+
 			}
 			else
 			{
@@ -209,22 +200,16 @@ void reader(char process)
 
 void writer(char process)
 {
-	char pname[2] = {process, '\0'};
 	while (1)
 	{	
 		P(&writeMutexMutex); // 只允许一个写者进程在writeMutex排队，其他写者进程只能在writeMutexMutex排队
 		P(&writeMutex);
-		printColorStr(pname, process);
-		printColorStr(" start.  ", process);
 		int j;
 		for (j = 0; j < p_proc_ready->needTime; ++j)
 		{
-			printColorStr(pname, process);
-			printColorStr(writeStr, process);
 			if (j == p_proc_ready->needTime - 1)
 			{
-				printColorStr(pname, process);
-				printColorStr(endStr, process);
+
 			}
 			else
 			{
@@ -237,38 +222,4 @@ void writer(char process)
 		p_proc_ready->isDone = solveHunger;
 		milli_delay(10);
 	}
-}
-
-void printColorStr(char *s, char color)
-{
-	if (disp_pos > 80 * 25 * 2)
-	{
-		return;
-	}
-	
-	myprint(s);
-	// switch (color)
-	// {
-	// case 'A':
-	// 	disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, RED));
-	// 	break;
-	// case 'B':
-	// 	disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, GREEN));
-	// 	break;
-	// case 'C':
-	// 	disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, BLUE));
-	// 	break;
-	// case 'F':
-	// 	disp_str(s);
-	// 	break;
-	// case 'D':
-	// 	disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, PURPLE));
-	// 	break;
-	// case 'E':
-	// 	disp_color_str(s, BRIGHT | MAKE_COLOR(BLACK, YELLO));
-	// 	break;
-	// default:
-	// 	disp_str(s);
-	// 	break;
-	// }
 }

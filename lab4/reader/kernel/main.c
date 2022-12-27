@@ -193,7 +193,6 @@ void F()
 
 void reader(char process)
 {
-    mysleep(TIME_SLICE);
     int current_index = process - 'A';
 	while (1)
 	{

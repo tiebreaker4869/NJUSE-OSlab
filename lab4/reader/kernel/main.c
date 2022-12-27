@@ -67,7 +67,7 @@ PUBLIC int kernel_main()
 	proc_table[5].ticks = proc_table[5].needTime = 1;
 
     for (int i = 0; i < NR_TASKS - 1; i ++) {
-        task_status = 2;
+        task_status[i] = 2;
     }
 
 	k_reenter = 0;
@@ -193,9 +193,11 @@ void F()
 
 void reader(char process)
 {
+    int current_index = process - 'A';
 	mysleep(10);
 	while (1)
 	{
+        task_status[current_index] = 1;
 		// 判断修改在读人数
 		P(&countMutex);
 		if (readPreparedCount == 0)
@@ -206,6 +208,7 @@ void reader(char process)
 		V(&countMutex);
 
 		P(&readMutex);
+        task_status[current_index] = 0;
 		readCount++;
 		int j;
 		for (j = 0; j < p_proc_ready->needTime; ++j)
@@ -228,6 +231,7 @@ void reader(char process)
 		{
 			V(&writeMutex);
 		}
+        task_status[current_index] = 2;
 		V(&countMutex);
 
 		p_proc_ready->isDone = solveHunger;
@@ -237,10 +241,13 @@ void reader(char process)
 
 void writer(char process)
 {
+    int current_index = process - 'A';
 	while (1)
-	{	
+	{
+        task_status[current_index] = 1;
 		P(&writeMutexMutex); // 只允许一个写者进程在writeMutex排队，其他写者进程只能在writeMutexMutex排队
 		P(&writeMutex);
+        task_status[current_index] = 0;
 		int j;
 		for (j = 0; j < p_proc_ready->needTime; ++j)
 		{
@@ -253,6 +260,7 @@ void writer(char process)
 				milli_delay(10);
 			}
 		}
+        task_status[current_index] = 2;
 		V(&writeMutex);
 		V(&writeMutexMutex);
 

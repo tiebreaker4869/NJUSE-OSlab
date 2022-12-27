@@ -40,7 +40,7 @@ get_ticks:
 ;                              print
 ; ====================================================================
 print:
-	mov	eax, _NR_myprint
+	mov	eax, _NR_print
 	mov ecx,[esp+4]
 	int	INT_VECTOR_SYS_CALL
 	ret

@@ -203,8 +203,9 @@ void A() {
         if (print_index > 20) {
             sleep(10);
         } else {
-            disp_int(print_index);
+
             print(" ");
+            print_index ++;
         }
         for (char process = 'B'; process <= 'F'; process++) {
             int index = process - 'A';

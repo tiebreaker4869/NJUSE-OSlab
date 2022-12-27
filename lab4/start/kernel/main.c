@@ -128,3 +128,74 @@ void TestC()
 	}
 }
 
+/*======================================================================*
+ *                      读者优先的读者进程
+ *======================================================================*/
+
+void reader_rf(char process)
+{
+    sleep(10);
+    char pname[2] = {process, '\0'};
+    while (1)
+    {
+        // 判断修改在读人数
+        P(&count_mutex);
+        if (read_prepared_count == 0)
+        {
+            P(&write_mutex);
+        }
+        read_prepared_count++;
+        V(&count_mutex);
+
+        P(&read_mutex);
+        read_count++;
+
+        for (int j = 0; j < p_proc_ready->demand_time; ++j)
+        {
+            if (j < p_proc_ready->demand_time - 1) {
+                milli_delay(10);
+            }
+        }
+
+        readCount--;
+        V(&read_mutex);
+
+        P(&count_mutex);
+        read_prepared_count--;
+        if (read_prepared_count == 0)
+        {
+            V(&write_mutex);
+        }
+        V(&count_mutex);
+
+        p_proc_ready->is_done = solve_hunger;
+        milli_delay(10); // 废弃当前时间片，至少等到下个时间片才能进入循环
+    }
+}
+
+
+/*======================================================================*
+ *                读者优先的写者进程
+ *======================================================================*/
+
+void writer_rf(char process)
+{
+    char pname[2] = {process, '\0'};
+    while (1)
+    {
+        P(&write_mutex_mutex); // 只允许一个写者进程在writeMutex排队，其他写者进程只能在writeMutexMutex排队
+        P(&write_mutex);
+        for (int j = 0; j < p_proc_ready->demand_time; ++j)
+        {
+            if (j < p_proc_ready->demand_time - 1) {
+                milli_delay(10);
+            }
+        }
+
+        V(&write_mutex);
+        V(&write_mutex_mutex);
+
+        p_proc_ready->is_done = solve_hunger;
+        milli_delay(10);
+    }
+}

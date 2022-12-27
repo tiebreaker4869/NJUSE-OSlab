@@ -29,8 +29,19 @@ extern	char		task_stack[];
 extern  TASK            task_table[];
 extern	irq_handler	irq_table[];
 
+// 以下是新添加的
 typedef struct semaphore {
     int value;
     PROCESS* wait_queue[NR_TASKS];
 } Semaphore;
 
+EXTERN Semaphore read_mutex; // value=并发数
+EXTERN Semaphore write_mutex;// value=1
+EXTERN Semaphore count_mutex;// value=1
+EXTERN Semaphore write_mutex_mutex;// value=1
+
+EXTERN int reader_limit;     // 允许同时读的个数
+EXTERN int writer_limit;    // 允许同时写的个数，默认为1
+EXTERN int read_prepared_count;
+EXTERN int read_count;   // 正在读的个数
+EXTERN int solve_hunger; // 是否解决饿死

@@ -16,6 +16,11 @@ typedef struct semaphore {
     PROCESS* wait_queue[NR_TASKS];
 } Semaphore;
 
+EXTERN Semaphore rmutex; // init_value = 1
+EXTERN Semaphore wmutex; // init_value = 1
+EXTERN Semaphore S; // init_value = 1
+EXTERN Semaphore reader_count_mutex; // 限制读者数量的信号量, init_value = 读者并发数
+
 EXTERN	int		ticks;
 
 EXTERN	int		disp_pos;

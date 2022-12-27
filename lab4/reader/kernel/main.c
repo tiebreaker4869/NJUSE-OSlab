@@ -193,6 +193,7 @@ void F()
 
 void reader(char process)
 {
+    mysleep(10);
     int current_index = process - 'A';
 	while (1)
 	{

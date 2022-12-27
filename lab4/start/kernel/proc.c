@@ -139,7 +139,7 @@ PUBLIC void wake_up(Semaphore *mutex) {
     }
 
     // 空缺之后的部分迁移一格，填补空缺
-    for (int i = index, i< -mutex->value; i++) {
+    for (int i = index; i< -mutex->value; i++) {
         mutex->wait_queue[i] = mutex->wait_queue[i + 1];
     }
 

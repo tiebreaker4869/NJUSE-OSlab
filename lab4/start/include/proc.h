@@ -40,6 +40,7 @@ typedef struct s_proc {
 		int demand_time;			/*需要的时间片*/
 		int is_done;				/*是否结束*/
 		int is_block;				/*是否阻塞*/
+		char type;					/*读者进程还是写者进程, 读者进程: r, 写者进程: w*/
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */

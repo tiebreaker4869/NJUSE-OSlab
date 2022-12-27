@@ -13,7 +13,7 @@
 
 typedef struct semaphore {
     int value;
-    PROCESS* wake_queue[NR_TASKS];
+    PROCESS* wait_queue[NR_TASKS];
 } Semaphore;
 
 EXTERN	int		ticks;

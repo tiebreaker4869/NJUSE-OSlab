@@ -194,7 +194,6 @@ void F()
 void reader(char process)
 {
     int current_index = process - 'A';
-	mysleep(10);
 	while (1)
 	{
         task_status[current_index] = 1;

@@ -205,7 +205,7 @@ void A() {
         }
         for (char process = 'B'; process <= 'F'; process++) {
             int index = process - 'A';
-            PROCESS *cur_process = proc_table[index];
+            PROCESS *cur_process = proc_table + index;
             if (cur_process->task_status == 0) {
                 print("X");
                 print(" ");

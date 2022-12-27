@@ -15,8 +15,6 @@
 
 
 PUBLIC init_task() {
-    p_proc_ready = proc_table;
-
     proc_table[0].priority = 100;
 
     proc_table[1].priority = 90;
@@ -40,6 +38,12 @@ PUBLIC init_task() {
     proc_table[4].demand_time = 3;
 
     proc_table[5].demand_time = 4;
+
+    proc_table[1].type = proc_table[2].type = proc_table[3].type = 'r';
+
+    proc_table[4].type = proc_table[5].type = 'w';
+
+    proc_table[0].type = 'o';
 
     /*初始化信号量相关*/
     reader_limit = 3;
@@ -104,6 +108,8 @@ PUBLIC int kernel_main() {
     k_reenter = 0;
     ticks = 0;
 
+    p_proc_ready = proc_table;
+
 
     init_task();
 
@@ -133,7 +139,6 @@ PUBLIC int kernel_main() {
  *======================================================================*/
 
 void reader_rf(char process) {
-    char pname[2] = {process, '\0'};
     while (1) {
         // 判断修改在读人数
         P(&count_mutex);
@@ -173,7 +178,6 @@ void reader_rf(char process) {
  *======================================================================*/
 
 void writer_rf(char process) {
-    char pname[2] = {process, '\0'};
     while (1) {
         P(&write_mutex_mutex); // 只允许一个写者进程在writeMutex排队，其他写者进程只能在writeMutexMutex排队
         P(&write_mutex);
@@ -205,17 +209,19 @@ void A() {
         }
         for (char process = 'B'; process <= 'F'; process++) {
             int index = process - 'A';
-            PROCESS *cur_process = proc_table + index;
-            if (cur_process->task_status == 0) {
-                print("X");
-                print(" ");
-            } else if (cur_process->task_status == 1) {
-                print("O");
-                print(" ");
-            } else if (cur_process->task_status == 2) {
-                print("Z");
-                print(" ");
-            }
+//            PROCESS *cur_process = proc_table + index;
+//            if (cur_process->task_status == 0) {
+//                print("X");
+//                print(" ");
+//            } else if (cur_process->task_status == 1) {
+//                print("O");
+//                print(" ");
+//            } else if (cur_process->task_status == 2) {
+//                print("Z");
+//                print(" ");
+//            }
+            char pname[2] = {process, '\0'};
+            print(pname);
         }
 
         print("\n");

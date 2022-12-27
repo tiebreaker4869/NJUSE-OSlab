@@ -67,7 +67,7 @@ PUBLIC int kernel_main()
 	proc_table[5].ticks = proc_table[5].needTime = 1;
 
     for (int i = 0; i < NR_TASKS - 1; i ++) {
-        proc_table[i].taskStatus = 2;
+        task_status = 2;
     }
 
 	k_reenter = 0;
@@ -99,7 +99,6 @@ PUBLIC int kernel_main()
 	disp_pos = 0;
 	for (i = 0; i < 80 * 25; i++)
 	{
-		// disp_str(" ");
 		disp_str(" ");
 	}
 	disp_pos = 0;
@@ -165,14 +164,13 @@ void F()
         myprint(" ");
 
         for (int i = 0; i < NR_TASKS - 1; i ++) {
-            PROCESS* cur_process = proc_table + i;
-            switch (cur_process->taskStatus) {
+            switch (task_status[i]) {
                 case 0:
-                    // 正在
+                    // 正在读 / 写
                     myprint("O");
                     break;
                 case 1:
-                    // 等待
+                    // 等待读 / 写
                     myprint("X");
                     break;
                 case 2:

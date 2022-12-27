@@ -50,3 +50,5 @@ EXTERN int solveHunger; // 是否解决饿死
 EXTERN char nowStatus;
 
 EXTERN int print_index;
+
+extern int task_status[];

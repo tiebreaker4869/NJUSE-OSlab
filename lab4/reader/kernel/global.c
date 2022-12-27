@@ -35,3 +35,5 @@ PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks,
                                                     sys_sleep,
                                                     sys_p,
                                                     sys_v};
+
+PUBLIC int task_status[NR_TASKS-1];

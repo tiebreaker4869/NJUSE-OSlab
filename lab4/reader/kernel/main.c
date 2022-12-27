@@ -146,7 +146,9 @@ void F()
             continue;
         }
 
-        myprint("this is output process\n");
+        myprint_int(print_index);
+
+        myprint("\n");
 
         print_index ++;
 

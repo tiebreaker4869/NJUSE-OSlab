@@ -13,18 +13,19 @@ ENTRYOFFSET	=   0x400
 # Programs, flags, etc.
 ASM		= nasm
 DASM		= ndisasm
-CC		= gcc -m32
+CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
-ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin
-LDFLAGS		= -m elf_i386 -s -Ttext $(ENTRYPOINT)
+ASMKFLAGS	= -I include/ -f elf32
+CFLAGS		= -I include/ -c -fno-builtin -m32 -fno-stack-protector
+LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 # This Program
 ORANGESBOOT	= boot/boot.bin boot/loader.bin
 ORANGESKERNEL	= kernel.bin
-OBJS		= kernel/kernel.o kernel/syscall.o kernel/start.o kernel/main.o kernel/clock.o\
+OBJS		= kernel/kernel.o kernel/syscall.o kernel/start.o kernel/main.o\
+			kernel/clock.o \
 			kernel/i8259.o kernel/global.o kernel/protect.o kernel/proc.o\
 			lib/kliba.o lib/klib.o lib/string.o
 DASMOUTPUT	= kernel.bin.asm
@@ -39,9 +40,6 @@ nop :
 everything : $(ORANGESBOOT) $(ORANGESKERNEL)
 
 all : realclean everything
-
-run: image
-	/opt/bochs-2.6.9/bochs -f bochsrc
 
 image : realclean everything clean buildimg
 
@@ -102,6 +100,7 @@ kernel/protect.o: kernel/protect.c include/type.h include/const.h include/protec
 kernel/proc.o: kernel/proc.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+
 lib/klib.o: lib/klib.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
 			include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
@@ -111,3 +110,6 @@ lib/kliba.o : lib/kliba.asm
 
 lib/string.o : lib/string.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+run:	image
+		bochs -f bochsrc

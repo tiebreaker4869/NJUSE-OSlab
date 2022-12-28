@@ -282,6 +282,7 @@ void TestF() {
             mydelay(tt * TIME_SLICE);
             continue;
         }
+
         if (print_index < 10) {
             char index[2] = {print_index + '0', '\0'};
             s = index;

@@ -219,9 +219,9 @@ void reader(char process)
 		{
 			V(&writeMutex);
 		}
-        task_status[current_index] = 2;
 		V(&countMutex);
 
+        task_status[current_index] = 2;
 		p_proc_ready->isDone = solveHunger;
 		mysleep(TIME_SLICE); // 废弃当前时间片，至少等到下个时间片才能进入循环
 	}
@@ -237,10 +237,10 @@ void writer(char process)
 		P(&writeMutex);
         task_status[current_index] = 0;
 		milli_delay(p_proc_ready->needTime * TIME_SLICE);
-        task_status[current_index] = 2;
 		V(&writeMutex);
 		V(&writeMutexMutex);
 
+        task_status[current_index] = 2;
 		p_proc_ready->isDone = solveHunger;
 		mysleep(TIME_SLICE);
 	}

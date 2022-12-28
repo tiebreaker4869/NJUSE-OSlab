@@ -143,7 +143,7 @@ void FAIR_W(char* s, int task_time){
 			business(task_time);
 			V(&w);
             task_status[current_index] = 2;
-            mydelay(1 * RR/ HZ * T)
+            mydelay(1 * RR/ HZ * T);
 	}
 }
 

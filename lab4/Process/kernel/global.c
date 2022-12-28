@@ -31,3 +31,5 @@ PUBLIC	irq_handler		irq_table[NR_IRQ];
 PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks, sys_print, sys_delay,
                                                         sys_P, sys_V};
 
+PUBLIC int task_status[NR_TASKS-1];
+

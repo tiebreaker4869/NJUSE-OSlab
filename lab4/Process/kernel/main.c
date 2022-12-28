@@ -76,6 +76,13 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table+NR_TASKS-1;
 
+    // 初始化任务状态
+    for (int i = 0; i < NR_TASKS - 1; i ++) {
+        task_status[i] = 2;
+    }
+
+    print_index = 1;
+
 	init_sema(&r, READERS);
 	init_sema(&w, WRITERS);
 	init_sema(&mutex, MUTEX);
@@ -84,7 +91,6 @@ PUBLIC int kernel_main()
 
 	init_queue();
 	init_clock();
-    // init_keyboard();
 	clear();
 
 	restart();
@@ -92,17 +98,14 @@ PUBLIC int kernel_main()
 	while(1){}
 }
 
-void business(char* s, int task_time){
-	int color = s[0]-'A'+1;
-	disp_color_str(s, color); disp_color_str(".start.\n", color);
-	// print(s); print(".start.\n");
-	mydelay(task_time / HZ * T);
-	disp_color_str(s, color); disp_color_str(".done.\n", color);
-	// print(s); print(".done.\n");
+void business(int task_time){
+	milli_delay(task_time / HZ * T);
 }
 
 void FAIR_R(char* s, int task_time){
+    int current_index = s[0] - 'A';
 	while (1) {
+        task_status[current_index] = 0;
 		P(&mutex);
 
 			P(&r);
@@ -113,8 +116,8 @@ void FAIR_R(char* s, int task_time){
 				V(&r_mutex);
 
 		V(&mutex);
-
-			business(s, task_time);
+            task_status[current_index] = 1;
+			business(task_time);
 			
 				P(&r_mutex);
 				r_count--;
@@ -122,18 +125,25 @@ void FAIR_R(char* s, int task_time){
 				V(&r_mutex);
 			
 			V(&r);
+            task_status[current_index] = 2;
+
+            mydelay(1 * RR / HZ * T);
 	}
 }
 void FAIR_W(char* s, int task_time){
-	while (1) {	
+	int current_index = s[0] - 'A';
+    while (1) {
+        task_status[current_index] = 0;
 		P(&mutex);
 
 			P(&w);
 
 		V(&mutex);
-
-			business(s, task_time);
+            task_statue[current_index] = 1;
+			business(task_time);
 			V(&w);
+            task_status[current_index] = 2;
+            mydelay(1 * RR/ HZ * T)
 	}
 }
 
@@ -146,7 +156,7 @@ void READER_FIRST_R(char* s, int task_time){
 			r_count++;
 			V(&r_mutex);
 		
-		business(s, task_time);
+		business(task_time);
 		
 			P(&r_mutex);
 			r_count--;
@@ -162,7 +172,7 @@ void READER_FIRST_R(char* s, int task_time){
 void READER_FIRST_W(char* s, int task_time){
 	while (1) {		
 		P(&w);
-		business(s, task_time);
+		business(task_time);
 		V(&w);
 	}
 }
@@ -178,7 +188,7 @@ void WRITER_FIRST_R(char* s, int task_time){
 				V(&r_mutex);
 			V(&mutex);
 
-		business(s, task_time);
+		business(task_time);
 		
 				P(&r_mutex);
 				r_count--;
@@ -196,7 +206,7 @@ void WRITER_FIRST_W(char* s, int task_time){
 		V(&w_mutex);
 
 		P(&w);
-		business(s, task_time);
+		business(task_time);
 		V(&w);
 
 		P(&w_mutex);
@@ -264,11 +274,39 @@ void TestE()
 void TestF()
 {
 	int tt = 1 * RR;
-	while (1) {	
-		char s[2] = {0}; s[0] = '0' + r_count;
-		if(r_count){
-			print("Now there's ");print(s);print(" readers reading.\n");
-		}else print("Now it's writing.\n");				  
-		mydelay(tt/HZ*T);
+    char* s;
+    if (print_index > 20) {
+        mydelay(tt / HZ * T);
+    } else {
+        if (print_index < 10) {
+            char index[2] = {print_index + '0', '\0'};
+            s = index;
+        } else {
+            char index[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
+            s = index;
+        }
+    }
+
+    print(s);
+
+    print(" ");
+
+    while (1) {
+        for (int i = 0; i < NR_TASKS-1; i ++) {
+            switch (task_status[i]) {
+                case 0:
+                    print("X");
+                    print(" ");
+                    break;
+                case 1:
+                    print("O");
+                    print(" ");
+                case 2:
+                    print("Z");
+                    print(" ");
+            }
+        }
+        print("\n");
+        mydelay(tt/HZ*T);
 	}
 }

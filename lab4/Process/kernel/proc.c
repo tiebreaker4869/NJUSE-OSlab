@@ -54,7 +54,15 @@ PUBLIC int sys_get_ticks()
  *======================================================================*/
 PUBLIC void sys_print(char* info)
 {
-	disp_str(info);
+	if (info[0] == 'X' && info[1] == '\0') {
+        disp_color_str(info, BRIGHT | RED);
+    } else if (info[0] == 'O' && info[1] == '\0') {
+        disp_color_str(info, BRIGHT | GREEN);
+    } else if (info[0] == 'Z' && info[1] == '\0') {
+        disp_color_str(info, BRIGHT | BLUE);
+    } else {
+        disp_str(info);
+    }
 }
 
 /*======================================================================*

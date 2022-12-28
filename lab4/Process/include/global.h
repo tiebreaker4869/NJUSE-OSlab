@@ -29,3 +29,7 @@ extern	char		task_stack[];
 extern  TASK            task_table[];
 extern	irq_handler	irq_table[];
 
+
+extern int task_status[NR_TASKS-1];
+
+EXTERN int print_index;

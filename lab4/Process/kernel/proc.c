@@ -21,7 +21,7 @@ PUBLIC void schedule()
 	// my Round-Robin algorithm, use a queue to get next process
 	while(QUEUE.head==QUEUE.tail) ;
 	p_proc_ready = dequeue();
-	p_proc_ready->ticks = RR;
+	p_proc_ready->ticks = TIME_SLICE;
 	// sys_print(p_proc_ready->p_name);
 }
 

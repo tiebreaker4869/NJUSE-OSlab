@@ -84,7 +84,7 @@ PUBLIC int kernel_main()
 	writeMutexMutex.value = 1;
 
 	// 是否需要解决饿死
-	solveHunger = 1;
+	solveHunger = 0;
 
     // 输出序号
     print_index = 1;

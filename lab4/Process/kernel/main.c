@@ -99,7 +99,7 @@ PUBLIC int kernel_main()
 }
 
 void business(int task_time){
-	milli_delay(task_time / HZ * T);
+	milli_delay(task_time * TIME_SLICE);
 }
 
 void FAIR_R(char* s, int task_time){
@@ -127,7 +127,7 @@ void FAIR_R(char* s, int task_time){
 			V(&r);
             task_status[current_index] = 2;
 
-            mydelay(1 * RR / HZ * T);
+            mydelay(TIME_SLICE);
 	}
 }
 void FAIR_W(char* s, int task_time){
@@ -143,7 +143,7 @@ void FAIR_W(char* s, int task_time){
 			business(task_time);
 			V(&w);
             task_status[current_index] = 2;
-            mydelay(1 * RR/ HZ * T);
+            mydelay(TIME_SLICE);
 	}
 }
 
@@ -227,7 +227,7 @@ void(* W_MODE[MODE_COUNT])(char*, int) = {FAIR_W, READER_FIRST_W, WRITER_FIRST_W
  *======================================================================*/
 void TestA()
 {
-	int tt = 2 * RR;
+	int tt = 2;
 	R_MODE[MODE]("A", tt);
 }
 
@@ -236,7 +236,7 @@ void TestA()
  *======================================================================*/
 void TestB()
 {
-	int tt = 3 * RR;
+	int tt = 3;
 	R_MODE[MODE]("B", tt);
 }
 
@@ -245,7 +245,7 @@ void TestB()
  *======================================================================*/
 void TestC()
 {
-	int tt = 3 * RR;
+	int tt = 3;
 	R_MODE[MODE]("C", tt);
 }
 
@@ -254,7 +254,7 @@ void TestC()
  *======================================================================*/
 void TestD()
 {
-	int tt = 3 * RR;
+	int tt = 3;
 	W_MODE[MODE]("D", tt);
 }
 
@@ -263,7 +263,7 @@ void TestD()
  *======================================================================*/
 void TestE()
 {
-	int tt = 4 * RR;
+	int tt = 4;
 	W_MODE[MODE]("E", tt);
 }
 
@@ -273,12 +273,12 @@ void TestE()
 
 void TestF()
 {
-	int tt = 1 * RR;
+	int tt = 1;
 
     while (1) {
         char* s;
         if (print_index > 20) {
-            mydelay(tt / HZ * T);
+            mydelay(tt * TIME_SLICE);
         } else {
             if (print_index < 10) {
                 char index[2] = {print_index + '0', '\0'};
@@ -303,12 +303,14 @@ void TestF()
                 case 1:
                     print("O");
                     print(" ");
+                    break;
                 case 2:
                     print("Z");
                     print(" ");
+                    break;
             }
         }
         print("\n");
-        mydelay(tt/HZ*T);
+        mydelay(tt * TIME_SLICE);
 	}
 }

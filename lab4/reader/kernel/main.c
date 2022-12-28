@@ -187,6 +187,7 @@ void F()
 
         print_index ++;
 
+        mysleep(TIME_SLICE);
 	}
 }
 

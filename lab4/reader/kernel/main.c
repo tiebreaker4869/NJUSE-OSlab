@@ -187,7 +187,6 @@ void F()
 
         print_index ++;
 
-		mysleep(TIME_SLICE);
 	}
 }
 
@@ -223,7 +222,8 @@ void reader(char process)
 
         task_status[current_index] = 2;
 		p_proc_ready->isDone = solveHunger;
-		mysleep(TIME_SLICE); // 废弃当前时间片，至少等到下个时间片才能进入循环
+
+		mysleep(TIME_SLICE); // rest
 	}
 }
 
@@ -242,6 +242,7 @@ void writer(char process)
 
         task_status[current_index] = 2;
 		p_proc_ready->isDone = solveHunger;
-		mysleep(TIME_SLICE);
+
+		mysleep(TIME_SLICE); //rest
 	}
 }

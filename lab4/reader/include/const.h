@@ -81,6 +81,6 @@
 /* system call */
 #define NR_SYS_CALL     5
 
-#define TIME_SLICE      1000
+#define TIME_SLICE      10
 
 #endif /* _ORANGES_CONST_H_ */

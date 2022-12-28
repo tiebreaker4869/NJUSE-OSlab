@@ -221,7 +221,12 @@ void reader(char process)
 		}
 		V(&countMutex);
 
-        task_status[current_index] = 2;
+        if (solveHunger) {
+            task_status[current_index] = 1;
+        } else {
+            task_status[current_index] = 2;
+        }
+        
 		p_proc_ready->isDone = solveHunger;
 
 		mysleep(TIME_SLICE); // rest
@@ -241,7 +246,12 @@ void writer(char process)
 		V(&writeMutex);
 		V(&writeMutexMutex);
 
-        task_status[current_index] = 2;
+        if (solveHunger) {
+            task_status[current_index] = 1;
+        } else {
+            task_status[current_index] = 2;
+        }
+
 		p_proc_ready->isDone = solveHunger;
 
 		mysleep(TIME_SLICE); //rest

@@ -139,7 +139,7 @@ void FAIR_W(char* s, int task_time){
 			P(&w);
 
 		V(&mutex);
-            task_statue[current_index] = 1;
+            task_status[current_index] = 1;
 			business(task_time);
 			V(&w);
             task_status[current_index] = 2;

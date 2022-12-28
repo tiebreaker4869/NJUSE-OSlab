@@ -274,24 +274,26 @@ void TestE()
 void TestF()
 {
 	int tt = 1 * RR;
-    char* s;
-    if (print_index > 20) {
-        mydelay(tt / HZ * T);
-    } else {
-        if (print_index < 10) {
-            char index[2] = {print_index + '0', '\0'};
-            s = index;
-        } else {
-            char index[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
-            s = index;
-        }
-    }
-
-    print(s);
-
-    print(" ");
 
     while (1) {
+        char* s;
+        if (print_index > 20) {
+            mydelay(tt / HZ * T);
+        } else {
+            if (print_index < 10) {
+                char index[2] = {print_index + '0', '\0'};
+                s = index;
+            } else {
+                char index[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
+                s = index;
+            }
+        }
+
+        print(s);
+
+        print(" ");
+
+        print_index ++;
         for (int i = 0; i < NR_TASKS-1; i ++) {
             switch (task_status[i]) {
                 case 0:

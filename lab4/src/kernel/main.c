@@ -168,7 +168,7 @@ void read_rf(char proc, int slices, char color){
 
     P(&r_mutex);
     if (readers==0)
-        P(&w_mrutex);
+        P(&w_mutex);
     readers++;
     V(&r_mutex);
 

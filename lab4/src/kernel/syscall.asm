@@ -29,18 +29,21 @@ bits 32
 ; ====================================================================
 get_ticks:
 	mov	eax, _NR_get_ticks
-	jmp	sys_call_block
+	int	INT_VECTOR_SYS_CALL
+	ret
 
 write_str:
 	mov	eax, _NR_write_str
 	mov	ebx, [esp+4]	;参数1
 	mov	ecx, [esp+8]	;参数2
-	jmp	sys_call_block
+	int	INT_VECTOR_SYS_CALL
+	ret
 
 sleep_ms:
 	mov	eax, _NR_sleep_ms
 	mov	ebx, [esp+4]
-	jmp	sys_call_block
+	int	INT_VECTOR_SYS_CALL
+	ret
 
 P:
 	mov	eax, _NR_P

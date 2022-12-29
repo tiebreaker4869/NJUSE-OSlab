@@ -22,15 +22,15 @@ PUBLIC void	delay(int time);
 PUBLIC char* itoa(char* str, int num);
 
 /* kernel.asm */
-void restart();
+PUBLIC void restart();
 
 /* main.c */
-void ReaderA();
-void ReaderB();
-void ReaderC();
-void WriterD();
-void WriterE();
-void ReporterF();
+PUBLIC void ReaderA();
+PUBLIC void ReaderB();
+PUBLIC void ReaderC();
+PUBLIC void WriterD();
+PUBLIC void WriterE();
+PUBLIC void ReporterF();
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);

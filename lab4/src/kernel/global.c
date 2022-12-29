@@ -50,3 +50,4 @@ PUBLIC  SEMAPHORE w_mutex = {1, 0, 0};
 PUBLIC  SEMAPHORE r_mutex = {1, 0, 0};
 PUBLIC  SEMAPHORE queue = {1, 0, 0};
 PUBLIC  SEMAPHORE n_r_mutex = {MAX_READERS, 0, 0};
+PUBLIC int tr;

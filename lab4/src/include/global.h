@@ -43,3 +43,5 @@ extern  SEMAPHORE   r_mutex;
 extern  SEMAPHORE   queue;
 extern  SEMAPHORE   n_r_mutex;
 
+extern int tr;
+

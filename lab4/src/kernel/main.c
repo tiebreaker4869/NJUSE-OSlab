@@ -250,7 +250,7 @@ write_f write_funcs[3] = {write_gp, write_rf, write_wf};
 void ReaderA()
 {
 	sleep_ms(TIME_SLICE);
-	while(true){
+	while(TRUE){
 		read_funcs[strategy]('A', 2, '\01');
 		sleep_ms(TIME_SLICE);
 	}
@@ -262,7 +262,7 @@ void ReaderA()
 void ReaderB()
 {
 	sleep_ms(2*TIME_SLICE);
-	while(true){
+	while(TRUE){
 		read_funcs[strategy]('B', 3, '\02');
 		sleep_ms(TIME_SLICE);
 	}
@@ -274,7 +274,7 @@ void ReaderB()
 void ReaderC()
 {
 	sleep_ms(3*TIME_SLICE);
-	while(true){
+	while (TRUE) {
 		read_funcs[strategy]('C', 3, '\03');
 		sleep_ms(TIME_SLICE);
 	}
@@ -286,7 +286,7 @@ void ReaderC()
 void writerD()
 {
 	sleep_ms(4*TIME_SLICE);
-	while(true){
+	while (TRUE) {
 		write_funcs[strategy]('D', 3, '\04');
 		sleep_ms(TIME_SLICE);
 	}
@@ -298,7 +298,7 @@ void writerD()
 void writerE()
 {
 	sleep_ms(5*TIME_SLICE);
-	while(true){
+	while(TRUE){
 		write_funcs[strategy]('E', 4, '\05');
 		sleep_ms(TIME_SLICE);
 	}
@@ -312,7 +312,7 @@ void Reporter()
     sleep_ms(TIME_SLICE);
     char color = '\06';
     int time = 0;
-    while (true) {
+    while (TRUE) {
         printf("%ctime: %d\n", '\06', time++);
         if (readers > 0 && tr > 0){
             printf("%c%d of processes are reading\n", color, tr);

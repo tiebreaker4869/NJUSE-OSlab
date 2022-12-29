@@ -105,5 +105,7 @@
 #define BRIGHT_RED      0x0C
 #define BRIGHT_GREEN    0x0A
 #define BRIGHT_BLUE    	0x09    /* 1001 */
+#define TRUE 1
+#define FALSE 0
 
 #endif /* _ORANGES_CONST_H_ */

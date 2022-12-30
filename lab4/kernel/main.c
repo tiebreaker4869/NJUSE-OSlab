@@ -263,7 +263,7 @@ void writer_read(int i, int time) {
 		p_sys(&wrt);
         status[i] = WORKING;
 		milli_delay(time * WRITING_TIME);
-		status = RESTING;
+		status[i] = RESTING;
 		v_sys(&wrt);
 		delay_sys(GAP_TIME);
 	}

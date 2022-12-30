@@ -56,6 +56,7 @@ PUBLIC int sys_get_ticks();        /* sys_call */
 PUBLIC void sys_delay(int i);
 PUBLIC void sys_p(SEMAPHORE *);
 PUBLIC void sys_v(SEMAPHORE *);
+PUBLIC void sys_disp_str(char*);
 
 /* syscall.asm 系统调用 */
 PUBLIC void sys_call();             /* int_handler */

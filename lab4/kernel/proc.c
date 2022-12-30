@@ -79,7 +79,7 @@ PUBLIC int sys_disp_str(char* s) {
     } else if (s[0] == 'O' && s[1] == '\0') {
         disp_color_str(s, BRIGHT | GREEN);
     } else if (s[0] == 'Z' && s[1] == '\0') {
-        disp_color_str(BRIGHT | BLUE);
+        disp_color_str(s, BRIGHT | BLUE);
     } else {
         disp_str(s);
     }

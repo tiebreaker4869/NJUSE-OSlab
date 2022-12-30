@@ -16,11 +16,11 @@
 // 阅读者上限
 #define READER_MAX        3
 // 阅读时间
-#define READING_TIME    10 * 50000 / HZ
+#define READING_TIME    10
 // 写入时间
-#define WRITING_TIME    10 * 50000 / HZ
+#define WRITING_TIME    10
 // 每次任务间隔时间
-#define GAP_TIME        50000 / HZ
+#define GAP_TIME        10
 // 读者优先还是写者优先 0是读者优先 1是写者优先
 #define WHO_FIRST        0
 

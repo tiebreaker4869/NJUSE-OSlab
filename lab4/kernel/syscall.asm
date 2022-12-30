@@ -7,32 +7,19 @@
 
 %include "sconst.inc"
 
-extern disp_str
-extern do_sys_p
-extern do_sys_v
-extern sys_delay_c
-
 _NR_get_ticks       equ 0 ; 要跟 global.c 中 sys_call_table 的定义相对应！
-_NR_disp_str_sys	equ 1 
-_NR_p 				equ 2
-_NR_v				equ 3
-_NR_sys_delay		equ 4
-
+_NR_myprint      	equ 1 ; 
+_NR_mysleep      	equ 2 ; 
+_NR_p      	equ 3 ; 
+_NR_v      	equ 4 ; 
 INT_VECTOR_SYS_CALL equ 0x90
 
 ; 导出符号
 global	get_ticks
-
-global 	disp_str_sys
-global 	sys_disp_str
-
-global 	p_sys
-global 	v_sys
-global 	sys_p
-global 	sys_v
-
-global 	delay_sys
-global 	sys_delay
+global	myprint
+global	mysleep
+global	P
+global	V
 
 bits 32
 [section .text]
@@ -45,62 +32,25 @@ get_ticks:
 	int	INT_VECTOR_SYS_CALL
 	ret
 
-disp_str_sys:
-	; 准备好现场，准备发起中断
-	mov eax, _NR_disp_str_sys
-	push ebx
-	mov ebx, [esp+8]
+myprint:
+	mov	eax, _NR_myprint
+	mov ecx,[esp+4]
+	int	INT_VECTOR_SYS_CALL
+	ret
+mysleep:
+	mov	eax, _NR_mysleep
+	mov ecx,[esp+4]
+	int	INT_VECTOR_SYS_CALL
+	ret
+P:
+	mov eax,_NR_p
+	mov ecx,[esp+4];
 	int INT_VECTOR_SYS_CALL
-	pop ebx
 	ret
 
-p_sys:
-	; 准备好现场，准备发起中断
-	mov eax, _NR_p
-	push ebx
-	mov ebx, [esp+8]
+V:
+	mov eax,_NR_v
+	mov ecx,[esp+4]
 	int INT_VECTOR_SYS_CALL
-	pop ebx
 	ret
 
-sys_p:
-	; 信号量执行P操作
-	pusha
-	push ebx
-	call do_sys_p
-	pop ebx
-	popa
-	ret
-
-v_sys:
-	; 准备好现场，准备发起中断
-	mov eax, _NR_v
-	push ebx
-	mov ebx, [esp+8]
-	int INT_VECTOR_SYS_CALL
-	pop ebx
-	ret
-
-sys_v:
-	; 信号量执行V操作
-	pusha
-	push ebx
-	call do_sys_v
-	pop ebx
-	popa
-	ret
-
-delay_sys:
-	; 准备好现场，准备发起中断
-	mov eax, _NR_sys_delay
-	push ebx
-	mov ebx, [esp+8]
-	int INT_VECTOR_SYS_CALL
-	pop ebx
-	ret
-
-sys_delay:
-	push ebx
-	call sys_delay_c
-	pop ebx
-	ret

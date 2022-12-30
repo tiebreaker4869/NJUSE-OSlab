@@ -83,4 +83,5 @@ PUBLIC void sys_disp_str(char* s) {
     } else {
         disp_str(s);
     }
+	disp_str(s);
 }

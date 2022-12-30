@@ -30,3 +30,5 @@ extern PROCESS proc_table[];
 extern char task_stack[];
 extern TASK task_table[];
 extern irq_handler irq_table[];
+extern PROCESS* pre_proc_ready;
+extern int flag;

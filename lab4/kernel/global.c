@@ -37,3 +37,7 @@ PUBLIC    system_call sys_call_table[NR_SYS_CALL] = {
 		sys_p,
 		sys_v
 };
+
+PUBLIC PROCESS* pre_proc_ready;
+
+PUBLIC int flag;

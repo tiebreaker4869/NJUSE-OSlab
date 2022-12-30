@@ -53,7 +53,7 @@ PUBLIC int kernel_main() {
 	u16 selector_ldt = SELECTOR_LDT_FIRST;
 	int i;
 	/* 初始化进程表 */
-	for (i = 0; i < NR_TASKS; i++) {
+	for (i = 0; i < 6; i++) {
 		strcpy(p_proc->p_name, p_task->name);    // name of the process
 		p_proc->pid = i;            // pid
 		
@@ -129,7 +129,8 @@ PUBLIC int kernel_main() {
 	disp_pos = 0;
 	
 	/* 扳机 */
-	p_proc_ready = proc_table;
+	p_proc_ready = proc_table + 4;
+
 	
 	// 8253 PIT
 	out_byte(TIMER_MODE, RATE_GENERATOR);
@@ -155,8 +156,15 @@ void initSemaphore(SEMAPHORE *semaphore, int number) {
                                reader_read 读者优先
  *======================================================================*/
 void reader_read(int i, int time) {
+	// char* s;
+	// char name[2];
+	// name[0] = 'A' + i;
+	// name[1] = '\0';
+	// s = name;
 	while (1) {
         status[i] = WAITING;
+		
+
 		P(&mutex);
 		if (reader_cnt == 0) {
 			P(&wrt);
@@ -166,8 +174,10 @@ void reader_read(int i, int time) {
 		
 		P(&reader);//最多允许多少个读者一起读
         status[i] = WORKING;
+
+
 		milli_delay(time * READING_TIME);
-        status[i] = RESTING;
+
 		V(&reader);
 		
 		P(&mutex);
@@ -177,7 +187,10 @@ void reader_read(int i, int time) {
 		}
 		V(&mutex);
 
-        mysleep(GAP_TIME);
+
+		status[i] = RESTING;
+
+		mysleep(10);
 	}
 }
 
@@ -256,8 +269,8 @@ void writer_read(int i, int time) {
 		P(&wrt);
         status[i] = WORKING;
 		milli_delay(time * WRITING_TIME);
-		status[i] = RESTING;
 		V(&wrt);
+		status[i] = RESTING;
 		mysleep(GAP_TIME);
 	}
 }
@@ -322,7 +335,7 @@ void WriterE() {
 void F() {
 	while (1) {
         if (print_index > 20) {
-            mysleep(5000);
+            mysleep(10);
             continue;
         }
         char* s;
@@ -353,7 +366,7 @@ void F() {
 
         print_index ++;
 
-		mysleep(5000);
+		mysleep(10);
 	}
 }
 

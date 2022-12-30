@@ -16,12 +16,12 @@
 
 // 进程调度
 PUBLIC void schedule() {
+
 	int t = 0;
-	
 	while (1) {
 		t = get_ticks();
 		p_proc_ready++;
-		if (p_proc_ready >= proc_table + NR_TASKS) {
+		if (p_proc_ready >= proc_table + 6) {
 			p_proc_ready = proc_table;
 		}
 		if (p_proc_ready->waiting_semahore == 0 && p_proc_ready->ready_tick <= t) {

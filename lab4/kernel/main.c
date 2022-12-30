@@ -321,37 +321,37 @@ void WriterE() {
  *======================================================================*/
 void F() {
 	while (1) {
-//        if (print_index > 20) {
-//            delay_sys(5000);
-//            continue;
-//        }
-//        char* s;
-//        if (print_index < 10) {
-//            char i[2] = {print_index + '0', '\0'};
-//            s = i;
-//        } else {
-//            char i[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
-//            s = i;
-//        }
-//
-//        disp_str_sys(s);
-//
-//        disp_str_sys(" ");
-//
-//        for (int i = 0; i < 5; i ++) {
-//            if (status[i] == RESTING) {
-//                disp_str_sys("Z");
-//            } else if (status[i] == WORKING) {
-//                disp_str_sys("O");
-//            } else if (status[i] == WAITING) {
-//                disp_str_sys("X");
-//            }
-//            disp_str_sys(" ");
-//        }
-//
-//        disp_str_sys("\n");
-//
-//        print_index ++;
+        if (print_index > 20) {
+            delay_sys(5000);
+            continue;
+        }
+        char* s;
+        if (print_index < 10) {
+            char i[2] = {print_index + '0', '\0'};
+            s = i;
+        } else {
+            char i[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
+            s = i;
+        }
+
+        disp_str_sys(s);
+
+        disp_str_sys(" ");
+
+        for (int i = 0; i < 5; i ++) {
+            if (status[i] == RESTING) {
+                disp_str_sys("Z");
+            } else if (status[i] == WORKING) {
+                disp_str_sys("O");
+            } else if (status[i] == WAITING) {
+                disp_str_sys("X");
+            }
+            disp_str_sys(" ");
+        }
+
+        disp_str_sys("\n");
+
+        print_index ++;
 
 		delay_sys(5000);
 	}

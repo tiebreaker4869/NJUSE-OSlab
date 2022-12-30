@@ -31,14 +31,14 @@ PUBLIC void schedule() {
 }
 
 // 不分配时间片来切换，这部分被汇编调用
-PUBLIC void sys_delay_c(int i) {
+PUBLIC void sys_delay(int i) {
 	p_proc_ready->ready_tick = get_ticks() + i / (1000 / HZ);
 	// delay则进行进程切换
 	schedule();
 }
 
 // 执行信号量P操作
-PUBLIC void do_sys_p(SEMAPHORE *semaphore) {
+PUBLIC void sys_p(SEMAPHORE *semaphore) {
 	semaphore->number--;
 	if (semaphore->number < 0) {
 		// 等待一个信号量
@@ -51,7 +51,7 @@ PUBLIC void do_sys_p(SEMAPHORE *semaphore) {
 	}
 }
 // 执行信号量V操作
-PUBLIC void do_sys_v(SEMAPHORE *semaphore) {
+PUBLIC void sys_v(SEMAPHORE *semaphore) {
 	semaphore->number++;
 	if (semaphore->number <= 0) {
 		// 等待队列中的第一个进程取出来

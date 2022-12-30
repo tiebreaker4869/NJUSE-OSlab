@@ -157,27 +157,27 @@ void initSemaphore(SEMAPHORE *semaphore, int number) {
 void reader_read(int i, int time) {
 	while (1) {
         status[i] = WAITING;
-		p_sys(&mutex);
+		P(&mutex);
 		if (reader_cnt == 0) {
-			p_sys(&wrt);
+			P(&wrt);
 		}
 		reader_cnt++;
-		v_sys(&mutex);
+		V(&mutex);
 		
-		p_sys(&reader);//最多允许多少个读者一起读
+		P(&reader);//最多允许多少个读者一起读
         status[i] = WORKING;
 		milli_delay(time * READING_TIME);
         status[i] = RESTING;
-		v_sys(&reader);
+		V(&reader);
 		
-		p_sys(&mutex);
+		P(&mutex);
 		reader_cnt--;
 		if (reader_cnt == 0) {
-			v_sys(&wrt);
+			V(&wrt);
 		}
-		v_sys(&mutex);
+		V(&mutex);
 
-        delay_sys(GAP_TIME);
+        mysleep(GAP_TIME);
 	}
 }
 
@@ -186,29 +186,29 @@ void reader_read(int i, int time) {
  *======================================================================*/
 void reader_write(int i, int time) {
 	while (1) {
-		p_sys(&mutex3);
-		p_sys(&r);
-		p_sys(&mutex1);
+		P(&mutex3);
+		P(&r);
+		P(&mutex1);
 		if (reader_cnt == 0) {
-			p_sys(&w);
+			P(&w);
 		}
 		reader_cnt++;
-		v_sys(&mutex1);
-		v_sys(&r);
-		v_sys(&mutex3);
+		V(&mutex1);
+		V(&r);
+		V(&mutex3);
 		
-		p_sys(&reader);//最多允许多少个读者一起读
+		P(&reader);//最多允许多少个读者一起读
 
 		milli_delay(time * READING_TIME);
 		
-		v_sys(&reader);
+		V(&reader);
 		
-		p_sys(&mutex1);
+		P(&mutex1);
 		reader_cnt--;
 		if (reader_cnt == 0) {
-			v_sys(&w);
+			V(&w);
 		}
-		v_sys(&mutex1);
+		V(&mutex1);
 		
 		milli_delay(GAP_TIME);
 	}
@@ -253,12 +253,12 @@ void ReaderC() {
 void writer_read(int i, int time) {
 	while (1) {
         status[i] = WAITING;
-		p_sys(&wrt);
+		P(&wrt);
         status[i] = WORKING;
 		milli_delay(time * WRITING_TIME);
 		status[i] = RESTING;
-		v_sys(&wrt);
-		delay_sys(GAP_TIME);
+		V(&wrt);
+		mysleep(GAP_TIME);
 	}
 }
 
@@ -268,27 +268,27 @@ void writer_read(int i, int time) {
 void writer_write(int i, int time) {
 	while (1) {
 		// 控制写进程
-		//p_sys(&S);
-		p_sys(&mutex2);
+		//P(&S);
+		P(&mutex2);
 		writer_cnt++;
 		if (writer_cnt == 1) {
-			p_sys(&r);
+			P(&r);
 		}
-		v_sys(&mutex2);
+		V(&mutex2);
 		
-		p_sys(&w);
+		P(&w);
 
 		milli_delay(time * WRITING_TIME);
 
-		v_sys(&w);
+		V(&w);
 		
-		p_sys(&mutex2);
+		P(&mutex2);
 		writer_cnt--;
 		if (writer_cnt == 0) {
-			v_sys(&r);
+			V(&r);
 		}
-		v_sys(&mutex2);
-		//v_sys(&S);
+		V(&mutex2);
+		//V(&S);
 		milli_delay(GAP_TIME);
 	}
 }
@@ -322,7 +322,7 @@ void WriterE() {
 void F() {
 	while (1) {
         if (print_index > 20) {
-            delay_sys(5000);
+            mysleep(5000);
             continue;
         }
         char* s;
@@ -334,26 +334,26 @@ void F() {
             s = i;
         }
 
-        disp_str_sys(s);
+        myprint(s);
 
-        disp_str_sys(" ");
+        myprint(" ");
 
         for (int i = 0; i < 5; i ++) {
             if (status[i] == RESTING) {
-                disp_str_sys("Z");
+                myprint("Z");
             } else if (status[i] == WORKING) {
-                disp_str_sys("O");
+                myprint("O");
             } else if (status[i] == WAITING) {
-                disp_str_sys("X");
+                myprint("X");
             }
-            disp_str_sys(" ");
+            myprint(" ");
         }
 
-        disp_str_sys("\n");
+        myprint("\n");
 
         print_index ++;
 
-		delay_sys(5000);
+		mysleep(5000);
 	}
 }
 

@@ -53,31 +53,19 @@ PUBLIC void milli_delay(int milli_sec);
 
 /* proc.c */
 PUBLIC int sys_get_ticks();        /* sys_call */
-PUBLIC void sys_delay_c(int i);
-
-PUBLIC void do_sys_p(SEMAPHORE *);
-
-PUBLIC void do_sys_v(SEMAPHORE *);
+PUBLIC void sys_delay(int i);
+PUBLIC void sys_p(SEMAPHORE *);
+PUBLIC void sys_v(SEMAPHORE *);
 
 /* syscall.asm 系统调用 */
 PUBLIC void sys_call();             /* int_handler */
 PUBLIC int get_ticks();
+PUBLIC void mysleep(int milli_seconds);
+PUBLIC void myprint(char *);
 
-PUBLIC void sys_p(SEMAPHORE *);
+PUBLIC void P(SEMAPHORE *);
 
-PUBLIC void sys_v(SEMAPHORE *);
-
-PUBLIC void delay_sys(int milli_seconds);
-
-PUBLIC void disp_str_sys(char *);
-
-PUBLIC void p_sys(SEMAPHORE *);
-
-PUBLIC void v_sys(SEMAPHORE *);
-
-PUBLIC void sys_delay(int i);
-
-PUBLIC void sys_disp_str(char *);
+PUBLIC void V(SEMAPHORE *);
 
 /* main.c */
 PUBLIC void clear();

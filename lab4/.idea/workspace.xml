@@ -6,13 +6,31 @@
   <component name="CMakePresetLoader"><![CDATA[{
   "useNewFormat": true
 }]]></component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="OS-Lab4" targetName="final" />
+      <config projectName="OS-Lab4" targetName="run" />
+      <config projectName="OS-Lab4" targetName="nop" />
+      <config projectName="OS-Lab4" targetName="buildimg" />
+      <config projectName="OS-Lab4" targetName="disasm" />
+      <config projectName="OS-Lab4" targetName="image" />
+      <config projectName="OS-Lab4" targetName="kernel.bin" />
+      <config projectName="OS-Lab4" targetName="all" />
+      <config projectName="OS-Lab4" targetName="everything" />
+      <config projectName="OS-Lab4" targetName="realclean" />
+    </generated>
+  </component>
   <component name="CMakeSettings">
-    <configurations>
-      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
-    </configurations>
+    <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a7e39ba2-c075-482e-80c7-c9301171f186" name="Changes" comment="" />
+    <list default="true" id="41516a7e-c007-4da8-963e-e34e91a4e9ee" name="Changes" comment="refract the project">
+      <change beforePath="$PROJECT_DIR$/a.img" beforeDir="false" afterPath="$PROJECT_DIR$/a.img" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel.bin" beforeDir="false" afterPath="$PROJECT_DIR$/kernel.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/global.c" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/global.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kernel/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/kernel/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/klib.c" beforeDir="false" afterPath="$PROJECT_DIR$/lib/klib.c" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,13 +39,39 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
   </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
+  <component name="MakefileLocalSettings">
+    <option name="availableProjects">
+      <map>
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="OS-Lab4" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="OS-Lab4" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="projectSyncType">
+      <map>
+        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
+      </map>
+    </option>
   </component>
-  <component name="ProjectId" id="2JZwP2Jrw4EnHubaWjiZchB6yRw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -40,7 +84,6 @@
     "WebServerToolWindowFactoryState": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "C:/Users/steven/Desktop/home/courses/NJUSE-OSlab",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,19 +91,132 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="RunManager" selected="Makefile Application.all">
+    <configuration name="all" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="all" CONFIG_NAME="all" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="buildimg" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="buildimg" CONFIG_NAME="buildimg" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="disasm" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="disasm" CONFIG_NAME="disasm" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="everything" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="everything" CONFIG_NAME="everything" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="final" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="final" CONFIG_NAME="final" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="image" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="image" CONFIG_NAME="image" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="kernel.bin" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="kernel.bin" CONFIG_NAME="kernel.bin" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="nop" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="nop" CONFIG_NAME="nop" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="realclean" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="realclean" CONFIG_NAME="realclean" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="run" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="OS-Lab4" TARGET_NAME="run" CONFIG_NAME="run" version="1">
+      <method v="2">
+        <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Makefile Application.all" />
+      <item itemvalue="Makefile Application.buildimg" />
+      <item itemvalue="Makefile Application.disasm" />
+      <item itemvalue="Makefile Application.everything" />
+      <item itemvalue="Makefile Application.final" />
+      <item itemvalue="Makefile Application.image" />
+      <item itemvalue="Makefile Application.realclean" />
+      <item itemvalue="Makefile Application.kernel.bin" />
+      <item itemvalue="Makefile Application.nop" />
+      <item itemvalue="Makefile Application.run" />
+    </list>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="a7e39ba2-c075-482e-80c7-c9301171f186" name="Changes" comment="" />
-      <created>1672298888243</created>
+      <changelist id="41516a7e-c007-4da8-963e-e34e91a4e9ee" name="Changes" comment="" />
+      <created>1671181106415</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1672298888243</updated>
-      <workItem from="1672298889731" duration="4483000" />
+      <updated>1671181106415</updated>
+      <workItem from="1671181107676" duration="2221000" />
+      <workItem from="1671238163436" duration="23858000" />
+      <workItem from="1671604159656" duration="1238000" />
+      <workItem from="1671680130558" duration="508000" />
+      <workItem from="1671684863728" duration="95000" />
+      <workItem from="1671693157269" duration="4461000" />
+      <workItem from="1671947839245" duration="1509000" />
+      <workItem from="1672102498927" duration="740000" />
+      <workItem from="1672103276237" duration="3183000" />
+      <workItem from="1672109153841" duration="14648000" />
+      <workItem from="1672214968143" duration="2332000" />
     </task>
+    <task id="LOCAL-00001" summary="intimate the project">
+      <created>1671606711214</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1671606711214</updated>
+    </task>
+    <task id="LOCAL-00002" summary="refract the project">
+      <created>1672115774039</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1672115774039</updated>
+    </task>
+    <task id="LOCAL-00003" summary="refract the project">
+      <created>1672127604336</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1672127604336</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="intimate the project" />
+    <MESSAGE value="refract the project" />
+    <option name="LAST_COMMIT_MESSAGE" value="refract the project" />
   </component>
 </project>

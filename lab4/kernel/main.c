@@ -14,7 +14,7 @@
 #include "global.h"
 
 // 阅读者上限
-#define READER_MAX        2
+#define READER_MAX        3
 // 阅读时间
 #define READING_TIME    10 * 50000 / HZ
 // 写入时间
@@ -24,12 +24,19 @@
 // 读者优先还是写者优先 0是读者优先 1是写者优先
 #define WHO_FIRST        0
 
+#define WAITING 0
+
+#define WORKING 1
+
+#define RESTING 2
+
 int reader_cnt = 0;
 int writer_cnt = 0;
 // 绿色，蓝色，红色，黄色
 int colors[4] = {0x0A, 0x03, 0x0C, 0x0E};
 char *names[5] = {"ReaderA", "ReaderB", "ReaderC", "WriterD", "WriterE"};
-int processList[5] = {0};
+int status[5];
+int print_index = 1;
 SEMAPHORE mutex, wrt, mutex1, mutex2, mutex3, w, r, reader;
 //SEMAPHORE reader, writer, writeBlock, S, mutexw;
 
@@ -109,6 +116,10 @@ PUBLIC int kernel_main() {
 	initSemaphore(&writeBlock, 1);
 	// 用于解决饿死问题的信号量
 	initSemaphore(&S, 1);*/
+
+    for (int i = 0; i < 5; i ++) {
+        status[i] = RESTING;
+    }
 	
 	reader_cnt = 0;
 	writer_cnt = 0;
@@ -152,6 +163,7 @@ void disp_one_line(int i, char *str, int color) {
  *======================================================================*/
 void reader_read(int i, int time) {
 	while (1) {
+        status[i] = WAITING;
 		p_sys(&mutex);
 		if (reader_cnt == 0) {
 			p_sys(&wrt);
@@ -160,15 +172,9 @@ void reader_read(int i, int time) {
 		v_sys(&mutex);
 		
 		p_sys(&reader);//最多允许多少个读者一起读
-		
-		disp_one_line(i, " is waiting ... ", colors[0]);
-		disp_one_line(i, " starts reading ... ", colors[0]);
-		processList[i] = 1;
-		disp_one_line(i, " is reading ... ", colors[0]);
+        status[i] = WORKING;
 		milli_delay(time * READING_TIME);
-		disp_one_line(i, " stop reading ... ", colors[0]);
-		processList[i] = 0;
-		
+        status[i] = RESTING;
 		v_sys(&reader);
 		
 		p_sys(&mutex);
@@ -177,8 +183,8 @@ void reader_read(int i, int time) {
 			v_sys(&wrt);
 		}
 		v_sys(&mutex);
-		
-		milli_delay(GAP_TIME);
+
+        delay_sys(GAP_TIME);
 	}
 }
 
@@ -199,14 +205,8 @@ void reader_write(int i, int time) {
 		v_sys(&mutex3);
 		
 		p_sys(&reader);//最多允许多少个读者一起读
-		
-		disp_one_line(i, " is waiting ... ", colors[0]);
-		disp_one_line(i, " starts reading ... ", colors[0]);
-		processList[i] = 1;
-		disp_one_line(i, " is reading ... ", colors[0]);
+
 		milli_delay(time * READING_TIME);
-		disp_one_line(i, " stop reading ... ", colors[0]);
-		processList[i] = 0;
 		
 		v_sys(&reader);
 		
@@ -259,18 +259,13 @@ void ReaderC() {
  *======================================================================*/
 void writer_read(int i, int time) {
 	while (1) {
+        status[i] = WAITING;
 		p_sys(&wrt);
-		
-		disp_one_line(i, " is waiting ... ", colors[1]);
-		disp_one_line(i, " starts writing ... ", colors[1]);
-		processList[i] = 1;
-		disp_one_line(i, " is writing ... ", colors[1]);
+        status[i] = WORKING;
 		milli_delay(time * WRITING_TIME);
-		disp_one_line(i, " finishs writing ... ", colors[1]);
-		processList[i] = 0;
-		
+		status = RESTING;
 		v_sys(&wrt);
-		milli_delay(GAP_TIME);
+		delay_sys(GAP_TIME);
 	}
 }
 
@@ -289,13 +284,9 @@ void writer_write(int i, int time) {
 		v_sys(&mutex2);
 		
 		p_sys(&w);
-		disp_one_line(i, " is waiting ... ", colors[1]);
-		disp_one_line(i, " starts writing ... ", colors[1]);
-		processList[i] = 1;
-		disp_one_line(i, " is writing ... ", colors[1]);
+
 		milli_delay(time * WRITING_TIME);
-		disp_one_line(i, " finishs writing ... ", colors[1]);
-		processList[i] = 0;
+
 		v_sys(&w);
 		
 		p_sys(&mutex2);
@@ -337,32 +328,36 @@ void WriterE() {
  *======================================================================*/
 void F() {
 	while (1) {
-		if (reader_cnt <= READER_MAX && reader_cnt > 0) {//如果有进程在读
-			disp_str_sys("F: ");
-			disp_str_sys("The number of ");
-			disp_color_str("reader", colors[0]);
-			disp_str_sys(" : ");
-			char *number = "0";
-			number[0] = (char) ('0' + reader_cnt);
-			disp_color_str(number, colors[0]);
-			disp_str_sys("\n");
-			disp_number++;
-		} else if (processList[3] != 0 || processList[4] != 0) {//如果有进程在写
-			disp_str_sys("F: ");
-			disp_str_sys("The name of ");
-			disp_color_str("writer", colors[1]);
-			disp_str_sys(" :");
-			
-			if (processList[3]) {
-				disp_str_sys(" ");
-				disp_color_str(names[3], colors[1]);
-			} else if (processList[4]) {
-				disp_str_sys(" ");
-				disp_color_str(names[4], colors[1]);
-			}
-			disp_str_sys("\n");
-			disp_number++;
-		}
+        if (print_index > 20) {
+            delay_sys(5000);
+            continue;
+        }
+        char* s;
+        if (print_index < 10) {
+            char i[2] = {print_index + '0', '\0'};
+            s = i;
+        } else {
+            char i[3] = {print_index / 10 + '0', print_index % 10 + '0', '\0'};
+            s = i;
+        }
+
+        disp_str_sys(s);
+
+        disp_str_sys(" ");
+
+        for (int i = 0; i < 5; i ++) {
+            if (status[i] == RESTING) {
+                disp_str_sys("Z");
+            } else if (status[i] == WORKING) {
+                disp_str_sys("O");
+            } else if (status[i] == WAITING) {
+                disp_str_sys("X");
+            }
+            disp_str_sys(" ");
+        }
+
+        disp_str_sys("\n");
+
 		delay_sys(5000);
 	}
 }

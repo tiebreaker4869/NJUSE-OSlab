@@ -8,6 +8,17 @@
 #ifndef    _ORANGES_CONST_H_
 #define    _ORANGES_CONST_H_
 
+#define BLACK   0x0     /* 0000 */
+#define WHITE   0x7     /* 0111 */
+#define RED     0x4     /* 0100 */
+#define GREEN   0x2     /* 0010 */
+#define BLUE    0x1     /* 0001 */
+#define PURPLE  0x5
+#define YELLO	0x6
+#define FLASH   0x80    /* 1000 0000 */
+#define BRIGHT  0x08    /* 0000 1000 */
+#define MAKE_COLOR(x,y) (x | y) /* MAKE_COLOR(Background,Foreground) */
+
 
 /* EXTERN */
 #define    EXTERN    extern    /* EXTERN is defined as extern except in global.c */

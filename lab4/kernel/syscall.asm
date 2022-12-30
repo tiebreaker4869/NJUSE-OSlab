@@ -54,15 +54,6 @@ disp_str_sys:
 	pop ebx
 	ret
 
-sys_disp_str:
-	; 具体执行中断内容
-	pusha 
-	push ebx
-	call disp_str
-	pop ebx
-	popa
-	ret
-
 p_sys:
 	; 准备好现场，准备发起中断
 	mov eax, _NR_p

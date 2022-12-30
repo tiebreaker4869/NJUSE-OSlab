@@ -151,13 +151,6 @@ void initSemaphore(SEMAPHORE *semaphore, int number) {
 	semaphore->end = 0;
 }
 
-void disp_one_line(int i, char *str, int color) {
-	disp_color_str(names[i], color);
-	disp_color_str(str, color);
-	disp_str_sys("\n");
-	disp_number++;
-}
-
 /*======================================================================*
                                reader_read 读者优先
  *======================================================================*/
@@ -357,6 +350,8 @@ void F() {
         }
 
         disp_str_sys("\n");
+
+        print_index ++;
 
 		delay_sys(5000);
 	}

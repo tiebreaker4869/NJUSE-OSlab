@@ -14,30 +14,16 @@
 #include "proc.h"
 #include "global.h"
 
-/* 进程表 */
-PUBLIC    PROCESS proc_table[NR_TASKS];
 
-PUBLIC    char task_stack[STACK_SIZE_TOTAL];
+PUBLIC	PROCESS			proc_table[NR_TASKS];
 
-/* TODO: fixed 任务列表 */
-PUBLIC    TASK task_table[NR_TASKS] = {
-		{ReaderA, STACK_SIZE_ReaderA, "ReaderA"},
-		{ReaderB, STACK_SIZE_ReaderB, "ReaderB"},
-		{ReaderC, STACK_SIZE_ReaderC, "ReaderC"},
-		{WriterD, STACK_SIZE_WriterD, "WriterD"},
-		{WriterE, STACK_SIZE_WriterD, "WriterE"},
-		{F,       STACK_SIZE_F,       "F"}};
+PUBLIC	char			task_stack[STACK_SIZE_TOTAL];
 
-PUBLIC    irq_handler irq_table[NR_IRQ];
+PUBLIC	TASK	task_table[NR_TASKS] = {{TestA, STACK_SIZE_TESTA, "TestA"},
+					{TestB, STACK_SIZE_TESTB, "TestB"},
+					{TestC, STACK_SIZE_TESTC, "TestC"}};
 
-PUBLIC    system_call sys_call_table[NR_SYS_CALL] = {
-		sys_get_ticks,
-		sys_disp_str,
-        sys_delay,
-		sys_p,
-		sys_v
-};
+PUBLIC	irq_handler		irq_table[NR_IRQ];
 
-PUBLIC PROCESS* pre_proc_ready;
+PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks};
 
-PUBLIC int flag;

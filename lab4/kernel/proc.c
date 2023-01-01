@@ -13,77 +13,35 @@
 #include "proc.h"
 #include "global.h"
 
+/*======================================================================*
+                              schedule
+ *======================================================================*/
+PUBLIC void schedule()
+{
+	PROCESS* p;
+	int	 greatest_ticks = 0;
 
-// 进程调度
-PUBLIC void schedule() {
-	int t = 0;
-	while (1) {
-		t = get_ticks();
-		p_proc_ready++;
-		if (p_proc_ready >= proc_table + 6) {
-			p_proc_ready = proc_table;
+	while (!greatest_ticks) {
+		for (p = proc_table; p < proc_table+NR_TASKS; p++) {
+			if (p->ticks > greatest_ticks) {
+				greatest_ticks = p->ticks;
+				p_proc_ready = p;
+			}
 		}
-		if (p_proc_ready->waiting_semahore == 0 && p_proc_ready->ready_tick <= t) {
-			break;
+
+		if (!greatest_ticks) {
+			for (p = proc_table; p < proc_table+NR_TASKS; p++) {
+				p->ticks = p->priority;
+			}
 		}
 	}
-}
-
-// 不分配时间片来切换，这部分被汇编调用
-PUBLIC void sys_delay(int i) {
-	p_proc_ready->ready_tick = get_ticks() + i / (1000 / HZ);
-	// delay则进行进程切换
-	schedule();
-}
-
-// 执行信号量P操作
-PUBLIC void sys_p(SEMAPHORE *semaphore) {
-	disable_irq(CLOCK_IRQ);
-	semaphore->number--;
-	if (semaphore->number < 0) {
-		// 等待一个信号量
-		p_proc_ready->waiting_semahore = semaphore;
-		
-		semaphore->list[semaphore->end] = p_proc_ready;
-		semaphore->end = (semaphore->end + 1) % SEMAPHORE_SIZE;
-		// 进行进程调度
-		schedule();
-	}
-	enable_irq(CLOCK_IRQ);
-}
-// 执行信号量V操作
-PUBLIC void sys_v(SEMAPHORE *semaphore) {
-	disable_irq(CLOCK_IRQ);
-	semaphore->number++;
-	if (semaphore->number <= 0) {
-		// 等待队列中的第一个进程取出来
-		PROCESS *p = semaphore->list[semaphore->start];
-		p->waiting_semahore = 0;
-		semaphore->start = (semaphore->start + 1) % SEMAPHORE_SIZE;
-	}
-	enable_irq(CLOCK_IRQ);
 }
 
 /*======================================================================*
                            sys_get_ticks
  *======================================================================*/
-PUBLIC int sys_get_ticks() {
+PUBLIC int sys_get_ticks()
+{
 	return ticks;
 }
 
-
-/*======================================================================*
-                           sys_disp_str
- *======================================================================*/
-
-PUBLIC void sys_disp_str(char* s) {
-    if (s[0] == 'X' && s[1] == '\0') {
-        disp_color_str(s, BRIGHT | RED);
-    } else if (s[0] == 'O' && s[1] == '\0') {
-        disp_color_str(s, BRIGHT | GREEN);
-    } else if (s[0] == 'Z' && s[1] == '\0') {
-        disp_color_str(s, BRIGHT | BLUE);
-    } else {
-        disp_str(s);
-    }
-}

@@ -13,34 +13,34 @@
 #include "proc.h"
 #include "global.h"
 
+
 /*======================================================================*
                            clock_handler
  *======================================================================*/
-// TODO: fixed
-PUBLIC void clock_handler(int irq) {
-	// 时钟中断处理程序
+PUBLIC void clock_handler(int irq)
+{
 	ticks++;
-	
+	p_proc_ready->ticks--;
+
 	if (k_reenter != 0) {
-		// 处理中断重入
 		return;
 	}
-	
-	schedule();
-	
-	if (disp_number >= 26) {
-		clear();
-	}
-	
-}
 
+	if (p_proc_ready->ticks > 0) {
+		return;
+	}
+
+	schedule();
+
+}
 
 /*======================================================================*
                               milli_delay
  *======================================================================*/
-PUBLIC void milli_delay(int milli_sec) {
-	// 使用系统调用完成系统延时，空转
-	int t = get_ticks();
-	
-	while (((get_ticks() - t) * 1000 / HZ) < milli_sec) {}
+PUBLIC void milli_delay(int milli_sec)
+{
+        int t = get_ticks();
+
+        while(((get_ticks() - t) * 1000 / HZ) < milli_sec) {}
 }
+

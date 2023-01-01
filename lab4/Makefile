@@ -13,11 +13,11 @@ ENTRYOFFSET	=   0x400
 # Programs, flags, etc.
 ASM		= nasm
 DASM		= ndisasm
-CC		= gcc -m32
-LD		= ld -m elf_i386
+CC		= gcc
+LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -fno-stack-protector
+CFLAGS		= -I include/ -c -fno-builtin
 LDFLAGS		= -s -Ttext $(ENTRYPOINT)
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
@@ -108,6 +108,3 @@ lib/kliba.o : lib/kliba.asm
 
 lib/string.o : lib/string.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
-
-run: image
-	bochs

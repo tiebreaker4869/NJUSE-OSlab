@@ -16,7 +16,6 @@
 
 // 进程调度
 PUBLIC void schedule() {
-
 	int t = 0;
 	while (1) {
 		t = get_ticks();
@@ -39,6 +38,7 @@ PUBLIC void sys_delay(int i) {
 
 // 执行信号量P操作
 PUBLIC void sys_p(SEMAPHORE *semaphore) {
+	disable_irq(CLOCK_IRQ);
 	semaphore->number--;
 	if (semaphore->number < 0) {
 		// 等待一个信号量
@@ -49,9 +49,11 @@ PUBLIC void sys_p(SEMAPHORE *semaphore) {
 		// 进行进程调度
 		schedule();
 	}
+	enable_irq(CLOCK_IRQ);
 }
 // 执行信号量V操作
 PUBLIC void sys_v(SEMAPHORE *semaphore) {
+	disable_irq(CLOCK_IRQ);
 	semaphore->number++;
 	if (semaphore->number <= 0) {
 		// 等待队列中的第一个进程取出来
@@ -59,6 +61,7 @@ PUBLIC void sys_v(SEMAPHORE *semaphore) {
 		p->waiting_semahore = 0;
 		semaphore->start = (semaphore->start + 1) % SEMAPHORE_SIZE;
 	}
+	enable_irq(CLOCK_IRQ);
 }
 
 /*======================================================================*

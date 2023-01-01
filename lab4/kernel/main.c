@@ -156,11 +156,6 @@ void initSemaphore(SEMAPHORE *semaphore, int number) {
                                reader_read 读者优先
  *======================================================================*/
 void reader_read(int i, int time) {
-	// char* s;
-	// char name[2];
-	// name[0] = 'A' + i;
-	// name[1] = '\0';
-	// s = name;
 	while (1) {
         status[i] = WAITING;
 		
@@ -366,7 +361,7 @@ void F() {
 
         print_index ++;
 
-		mysleep(10);
+		milli_delay(10);
 	}
 }
 

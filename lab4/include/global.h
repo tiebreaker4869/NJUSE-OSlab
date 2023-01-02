@@ -29,3 +29,14 @@ extern	char		task_stack[];
 extern  TASK            task_table[];
 extern	irq_handler	irq_table[];
 
+
+
+EXTERN int readerNum;
+EXTERN int writerNum;
+
+EXTERN SEMAPHORE readerLimit;     // 同时读同一本书的人数
+EXTERN SEMAPHORE writeBlock;      // 限制写进程
+EXTERN SEMAPHORE readBlock;       // 限制读进程，保证写优先
+EXTERN SEMAPHORE mutex_readerNum; // 保护 readerNum 的变化
+EXTERN SEMAPHORE mutex_writerNum; // 保护 writerNum 的变化
+EXTERN SEMAPHORE mutex_fair;      // 实现读写公平

@@ -61,9 +61,13 @@ PUBLIC int kernel_main()
 		selector_ldt += 1 << 3;
 	}
 
-	proc_table[0].ticks = proc_table[0].priority = 15;
-	proc_table[1].ticks = proc_table[1].priority =  5;
-	proc_table[2].ticks = proc_table[2].priority =  3;
+	for (int i = 0; i < NR_TASKS; i++) {
+    proc_table[i].ticks = 1;
+    proc_table[i].priority = 1;
+    proc_table[i].wake = 0;
+    proc_table[i].status = 2;
+    proc_table[i].is_blocked = 0;
+}
 
 	k_reenter = 0;
 	ticks = 0;
@@ -78,43 +82,84 @@ PUBLIC int kernel_main()
         put_irq_handler(CLOCK_IRQ, clock_handler); /* 设定时钟中断处理程序 */
         enable_irq(CLOCK_IRQ);                     /* 让8259A可以接收时钟中断 */
 
+	cleanScreen();
+
 	restart();
 
 	while(1){}
 }
 
-/*======================================================================*
-                               TestA
- *======================================================================*/
-void TestA()
-{
-	int i = 0;
-	while (1) {
-		disp_str("A.");
-		milli_delay(10);
+void PrinterA() {
+	int print_index = 1;
+
+	while (TRUE) {
+		if (print_index <= 20) {
+			char* index_str;
+
+			if (print_index < 10) {
+				char tmp[2] = {'0' + print_index, '\0'};
+				index_str = tmp;
+			} else {
+				char tmp[3] = {'0' + print_index / 10, '0' + print_index % 10, '\0'};
+				index_str = tmp;
+			}
+
+			print(index_str);
+			print(" ");
+
+			for (int i = 1; i < NR_TASKS; i ++) {
+				int status = proc_table[i].status;
+				switch (status) {
+					case 0:
+						print("X ");
+						break;
+					case 1:
+						print("O ");
+						break;
+					case 2:
+						print("Z ");
+						break;
+					default:
+						break;	
+				}
+			}
+
+			print("\n");
+
+			milli_delay(TIME_SLICE);
+		}
 	}
 }
 
-/*======================================================================*
-                               TestB
- *======================================================================*/
-void TestB()
-{
-	int i = 0x1000;
-	while(1){
-		disp_str("B.");
-		milli_delay(10);
-	}
+void ReaderB() {
+
 }
 
-/*======================================================================*
-                               TestB
- *======================================================================*/
-void TestC()
-{
-	int i = 0x2000;
-	while(1){
-		disp_str("C.");
-		milli_delay(10);
+void ReaderC() {
+
+}
+
+void ReaderD() {
+
+}
+
+void WriterE() {
+
+}
+
+void WriterF() {
+
+}
+
+// 添加清屏, 将显存指针指向第一个位置
+PUBLIC void cleanScreen() {
+	disp_pos = 0;
+	for (int i = 0; i < 80 * 25; i++) {
+		disp_str(" ");
 	}
+	disp_pos = 0;
+
+	// 初始化变量
+	readerNum = 0;
+	writerNum = 0;
 }

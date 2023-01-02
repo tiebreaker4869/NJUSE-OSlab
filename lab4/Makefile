@@ -13,7 +13,7 @@ ENTRYOFFSET	=   0x400
 # Programs, flags, etc.
 ASM		= nasm
 DASM		= ndisasm
-CC		= gcc
+CC		= gcc -m32 -fno-stack-protector
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
@@ -39,6 +39,9 @@ nop :
 everything : $(ORANGESBOOT) $(ORANGESKERNEL)
 
 all : realclean everything
+
+run : image
+	bochs -f bochsrc
 
 image : realclean everything clean buildimg
 

@@ -62,12 +62,12 @@ PUBLIC int kernel_main()
 	}
 
 	for (int i = 0; i < NR_TASKS; i++) {
-    proc_table[i].ticks = 1;
-    proc_table[i].priority = 1;
-    proc_table[i].wake = 0;
-    proc_table[i].status = 2;
-    proc_table[i].is_blocked = 0;
-}
+		proc_table[i].ticks = 1;
+		proc_table[i].priority = 1;
+		proc_table[i].wake_tick = 0;
+		proc_table[i].status = 2;
+		proc_table[i].isBlocked = 0;
+	}
 
 	k_reenter = 0;
 	ticks = 0;
@@ -82,73 +82,11 @@ PUBLIC int kernel_main()
         put_irq_handler(CLOCK_IRQ, clock_handler); /* 设定时钟中断处理程序 */
         enable_irq(CLOCK_IRQ);                     /* 让8259A可以接收时钟中断 */
 
-	cleanScreen();
+	cleanScreen(); // 清屏
 
 	restart();
 
 	while(1){}
-}
-
-void PrinterA() {
-	int print_index = 1;
-
-	while (TRUE) {
-		if (print_index <= 20) {
-			char* index_str;
-
-			if (print_index < 10) {
-				char tmp[2] = {'0' + print_index, '\0'};
-				index_str = tmp;
-			} else {
-				char tmp[3] = {'0' + print_index / 10, '0' + print_index % 10, '\0'};
-				index_str = tmp;
-			}
-
-			print(index_str);
-			print(" ");
-
-			for (int i = 1; i < NR_TASKS; i ++) {
-				int status = proc_table[i].status;
-				switch (status) {
-					case 0:
-						print("X ");
-						break;
-					case 1:
-						print("O ");
-						break;
-					case 2:
-						print("Z ");
-						break;
-					default:
-						break;	
-				}
-			}
-
-			print("\n");
-
-			milli_delay(TIME_SLICE);
-		}
-	}
-}
-
-void ReaderB() {
-
-}
-
-void ReaderC() {
-
-}
-
-void ReaderD() {
-
-}
-
-void WriterE() {
-
-}
-
-void WriterF() {
-
 }
 
 // 添加清屏, 将显存指针指向第一个位置
@@ -162,4 +100,88 @@ PUBLIC void cleanScreen() {
 	// 初始化变量
 	readerNum = 0;
 	writerNum = 0;
+}
+
+void NormalA() {
+	milli_delay(200);
+	int n = 0;
+	while (TRUE) {
+		if (n++ < 20) {
+			if(n < 10) {
+				char tmp[4] = {n + '0', ' ', ' ', '\0'};
+				print(tmp);
+			} else {
+				char tmp[4] = {(n / 10) + '0', (n % 10) + '0', ' ', '\0'};
+				print(tmp);
+			}
+			for (int i = 1; i < NR_TASKS; i++) {
+				int status = proc_table[i].status;
+				if (status == 0) {
+					print("X ");
+				} else if (status == 1) {
+					print("O ");
+				} else if (status == 2) {
+					print("Z ");
+				}
+			}
+			print("\n");
+			milli_delay(TIME_SLICE);
+			// sleep(TIME_SLICE);
+		}
+	}
+}
+
+void ReaderB() {
+	// milli_delay(TIME_SLICE);
+	while (TRUE) {
+		p_proc_ready->status = 0;
+		READER(2);
+		p_proc_ready->status = 2;
+		// sleep(TIME_SLICE);
+		milli_delay(TIME_SLICE);
+	}
+}
+
+void ReaderC() {
+	// milli_delay(TIME_SLICE);
+	while (TRUE) {
+		p_proc_ready->status = 0;
+		READER(3);
+		p_proc_ready->status = 2;
+		// sleep(TIME_SLICE);
+		milli_delay(TIME_SLICE * 1);
+	}
+}
+
+void ReaderD() {
+	// milli_delay(TIME_SLICE);
+	while (TRUE) {
+		p_proc_ready->status = 0;
+		READER(3);
+		p_proc_ready->status = 2;
+		// sleep(TIME_SLICE);
+		milli_delay(TIME_SLICE);
+	}
+}
+
+void WriterE() {
+	// milli_delay(TIME_SLICE);
+	while (TRUE) {
+		p_proc_ready->status = 0;
+		WRITER(3);
+		p_proc_ready->status = 2;
+		// sleep(TIME_SLICE);
+		milli_delay(TIME_SLICE);
+	}
+}
+
+void WriterF() {
+	// milli_delay(TIME_SLICE);
+	while (TRUE) {
+		p_proc_ready->status = 0;
+		WRITER(4);
+		p_proc_ready->status = 2;
+		// sleep(TIME_SLICE);
+		milli_delay(TIME_SLICE);
+	}
 }

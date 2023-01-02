@@ -16,6 +16,21 @@
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
 
+/* Color */
+/*
+ * e.g. MAKE_COLOR(BLUE, RED)
+ *      MAKE_COLOR(BLACK, RED) | BRIGHT
+ *      MAKE_COLOR(BLACK, RED) | BRIGHT | FLASH
+ */
+#define BLACK   0x0     /* 0000 */
+#define WHITE   0x7     /* 0111 */
+#define RED     0x4     /* 0100 */
+#define GREEN   0x2     /* 0010 */
+#define BLUE    0x1     /* 0001 */
+#define FLASH   0x80    /* 1000 0000 */
+#define BRIGHT  0x08    /* 0000 1000 */
+#define MAKE_COLOR(x,y) (x | y) /* MAKE_COLOR(Background,Foreground) */
+
 /* Boolean */
 #define	TRUE	1
 #define	FALSE	0
@@ -64,25 +79,9 @@
 /* system call */
 #define NR_SYS_CALL     5
 
-/* Color */
-/*
- * e.g. MAKE_COLOR(BLUE, RED)
- *      MAKE_COLOR(BLACK, RED) | BRIGHT
- *      MAKE_COLOR(BLACK, RED) | BRIGHT | FLASH
- */
-#define BLACK   0x0     /* 0000 */
-#define WHITE   0x7     /* 0111 */
-#define RED     0x4     /* 0100 */
-#define GREEN   0x2     /* 0010 */
-#define BLUE    0x1     /* 0001 */
-#define FLASH   0x80    /* 1000 0000 */
-#define BRIGHT  0x08    /* 0000 1000 */
-#define MAKE_COLOR(x,y) (x | y) /* MAKE_COLOR(Background,Foreground) */
-
-
-#define MAX_READERS     3   /* 可同时读的数量 1-3 */
+#define MAX_READERS     3   /* 可同时读的数量 */
 #define STRATEGY        0   /* 读优先--0  写优先--1  读写公平--2 */
-#define TIME_SLICE      1000 /* 一个时间片长度 */
 
+#define TIME_SLICE      1000 /* 一个时间片长度 */
 
 #endif /* _ORANGES_CONST_H_ */

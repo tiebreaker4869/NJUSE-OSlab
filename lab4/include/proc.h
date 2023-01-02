@@ -6,15 +6,6 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 
-typedef struct s_semaphore
-{
-	int value;
-	int head;
-	int tail;
-	PROCESS * queue[NR_TASKS]; // 正在等待该信号量的进程队列
-} SEMAPHORE;
-
-
 typedef struct s_stackframe {	/* proc_ptr points here				↑ Low			*/
 	u32	gs;		/* ┓						│			*/
 	u32	fs;		/* ┃						│			*/
@@ -46,10 +37,9 @@ typedef struct s_proc {
         int ticks;                 /* remained ticks */
         int priority;
 
-		int wake; // 被唤醒的时间
-		int status; // 进程状态
-		int is_blocked; // 进程是否被阻塞
-
+	int wake_tick;	/* 被唤醒时间 */
+	int status;		/* 进程状态 0--等待读写  1--正在读写  2--休息*/
+	int isBlocked; 	/* 是否被阻塞 */
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
@@ -66,17 +56,24 @@ typedef struct s_task {
 #define NR_TASKS	6
 
 /* stacks of tasks */
-#define STACK_SIZE_A	0x8000
-#define STACK_SIZE_B	0x8000
-#define STACK_SIZE_C	0x8000
-#define STACK_SIZE_D	0x8000
-#define STACK_SIZE_E	0x8000
-#define STACK_SIZE_F	0x8000
+#define STACK_SIZE_Normal_A	0x8000
+#define STACK_SIZE_Reader_B	0x8000
+#define STACK_SIZE_Reader_C	0x8000
+#define STACK_SIZE_Reader_D	0x8000
+#define STACK_SIZE_Writer_E	0x8000
+#define STACK_SIZE_Writer_F	0x8000
 
-#define STACK_SIZE_TOTAL	(STACK_SIZE_A + \
-				STACK_SIZE_B + \
-				STACK_SIZE_C + \
-				STACK_SIZE_D + \
-				STACK_SIZE_E + \
-				STACK_SIZE_F)
+#define STACK_SIZE_TOTAL	(STACK_SIZE_Normal_A + \
+							 STACK_SIZE_Reader_B + \
+							 STACK_SIZE_Reader_C + \
+							 STACK_SIZE_Reader_D + \
+							 STACK_SIZE_Writer_E + \
+							 STACK_SIZE_Writer_F)
 
+typedef struct s_semaphore
+{
+	int value;
+	int head;
+	int tail;
+	PROCESS * pQueue[NR_TASKS]; /* 等待信号量的进程队列 */
+} SEMAPHORE;

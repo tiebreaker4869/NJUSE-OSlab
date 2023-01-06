@@ -98,8 +98,8 @@ PUBLIC void cleanScreen() {
 	disp_pos = 0;
 
 	// 初始化变量
-	readerNum = 0;
-	writerNum = 0;
+	reader_count = 0;
+	writer_count = 0;
 }
 
 void NormalA() {
@@ -126,62 +126,51 @@ void NormalA() {
 			}
 			print("\n");
 			milli_delay(TIME_SLICE);
-			// sleep(TIME_SLICE);
 		}
 	}
 }
 
 void ReaderB() {
-	// milli_delay(TIME_SLICE);
 	while (TRUE) {
 		p_proc_ready->status = 0;
 		READER(2);
 		p_proc_ready->status = 2;
-		// sleep(TIME_SLICE);
-		milli_delay(TIME_SLICE);
+		sleep(TIME_SLICE);
 	}
 }
 
 void ReaderC() {
-	// milli_delay(TIME_SLICE);
 	while (TRUE) {
 		p_proc_ready->status = 0;
 		READER(3);
 		p_proc_ready->status = 2;
-		// sleep(TIME_SLICE);
-		milli_delay(TIME_SLICE * 1);
+		sleep(TIME_SLICE);
 	}
 }
 
 void ReaderD() {
-	// milli_delay(TIME_SLICE);
 	while (TRUE) {
 		p_proc_ready->status = 0;
 		READER(3);
 		p_proc_ready->status = 2;
-		// sleep(TIME_SLICE);
-		milli_delay(TIME_SLICE);
+		sleep(TIME_SLICE);
 	}
 }
 
 void WriterE() {
-	// milli_delay(TIME_SLICE);
 	while (TRUE) {
 		p_proc_ready->status = 0;
 		WRITER(3);
 		p_proc_ready->status = 2;
-		// sleep(TIME_SLICE);
-		milli_delay(TIME_SLICE);
+		sleep(TIME_SLICE);
 	}
 }
 
 void WriterF() {
-	// milli_delay(TIME_SLICE);
 	while (TRUE) {
 		p_proc_ready->status = 0;
 		WRITER(4);
 		p_proc_ready->status = 2;
-		// sleep(TIME_SLICE);
-		milli_delay(TIME_SLICE);
+		sleep(TIME_SLICE);
 	}
 }

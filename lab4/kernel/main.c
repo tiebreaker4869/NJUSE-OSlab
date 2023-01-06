@@ -104,16 +104,17 @@ PUBLIC void cleanScreen() {
 
 void NormalA() {
 	milli_delay(200);
-	int n = 0;
+	int print_index = 1;
 	while (TRUE) {
-		if (n++ < 20) {
-			if(n < 10) {
-				char tmp[4] = {n + '0', ' ', ' ', '\0'};
+		if (print_index <= 20) {
+			if(print_index < 10) {
+				char tmp[4] = {print_index + '0', ' ', ' ', '\0'};
 				print(tmp);
 			} else {
-				char tmp[4] = {(n / 10) + '0', (n % 10) + '0', ' ', '\0'};
+				char tmp[4] = {(print_index / 10) + '0', (print_index % 10) + '0', ' ', '\0'};
 				print(tmp);
 			}
+			print_index ++;
 			for (int i = 1; i < NR_TASKS; i++) {
 				int status = proc_table[i].status;
 				if (status == 0) {

@@ -34,9 +34,13 @@ PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_get_ticks,
                                                        sys_P,
                                                        sys_V};
 
-PUBLIC SEMAPHORE readerLimit = {MAX_READERS, 0, 0};
-PUBLIC SEMAPHORE writeBlock = {1, 0, 0};
-PUBLIC SEMAPHORE readBlock = {1, 0, 0};
-PUBLIC SEMAPHORE mutex_readerNum = {1, 0, 0};
-PUBLIC SEMAPHORE mutex_writerNum = {1, 0, 0};
-PUBLIC SEMAPHORE mutex_fair = {1, 0, 0};
+PUBLIC SEMAPHORE reader_limit = {MAX_READERS, 0, 0};
+PUBLIC SEMAPHORE writer_block = {1, 0, 0};
+PUBLIC SEMAPHORE reader_block = {1, 0, 0};
+PUBLIC SEMAPHORE m_reader_count = {1, 0, 0};
+PUBLIC SEMAPHORE m_writer_count = {1, 0, 0};
+PUBLIC SEMAPHORE S = {1, 0, 0};
+
+PUBLIC int reader_count;
+
+PUBLIC int writer_count;

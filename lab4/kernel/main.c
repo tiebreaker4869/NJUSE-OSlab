@@ -64,9 +64,9 @@ PUBLIC int kernel_main()
 	for (int i = 0; i < NR_TASKS; i++) {
 		proc_table[i].ticks = 1;
 		proc_table[i].priority = 1;
-		proc_table[i].wake_tick = 0;
+		proc_table[i].wake = 0;
 		proc_table[i].status = 2;
-		proc_table[i].isBlocked = 0;
+		proc_table[i].is_blocked = 0;
 	}
 
 	k_reenter = 0;

@@ -178,6 +178,7 @@ void WRITER_rf(int work_time)
 	milli_delay(work_time * TIME_SLICE);
 
 	V(&writer_block);
+	
 }
 
 /*======================================================================*

@@ -79,8 +79,8 @@
 /* system call */
 #define NR_SYS_CALL     5
 
-#define MAX_READERS     3   /* 可同时读的数量 */
-#define STRATEGY        0   /* 读优先--0  写优先--1  读写公平--2 */
+#define MAX_READERS     2   /* 可同时读的数量 */
+#define STRATEGY        2   /* 读优先--0  写优先--1  读写公平--2 */
 
 #define TIME_SLICE      1000 /* 一个时间片长度 */
 

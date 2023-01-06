@@ -19,7 +19,6 @@
 PUBLIC void schedule()
 {
 	PROCESS* p;
-	int	 greatest_ticks = 0;
 	int	 current_tick = get_ticks();
 
 	while (1) {
@@ -27,38 +26,11 @@ PUBLIC void schedule()
 		if (p_proc_ready >= proc_table + NR_TASKS) {
 			p_proc_ready = proc_table;
 		}
-		if (p_proc_ready->isBlocked == FALSE && 
-			p_proc_ready->wake_tick <= current_tick) {
+		if (p_proc_ready->is_blocked == FALSE &&
+			p_proc_ready->wake <= current_tick) {
 			break; // 寻找到进程
 		}
 	}
-
-	// for (p = proc_table; p < proc_table + NR_TASKS; p++) {
-	// 	if (p->wake_tick > 0) {
-	// 		p->wake_tick--;
-	// 	}
-	// }
-
-	// while (!greatest_ticks) {
-	// 	for (p = proc_table; p < proc_table + NR_TASKS; p++) {
-	// 		if (p_proc_ready->wake_tick > current_tick || p->isBlocked == TRUE) {
-	// 			continue;
-	// 		}
-	// 		if (p->ticks > greatest_ticks) {
-	// 			greatest_ticks = p->ticks;
-	// 			p_proc_ready = p;
-	// 		}
-	// 	}
-
-	// 	if (!greatest_ticks) {
-	// 		for (p = proc_table; p < proc_table + NR_TASKS; p++) {
-	// 			if (p->ticks > 0) { // 说明被阻塞了
-	// 				continue;
-	// 			}
-	// 			p->ticks = p->priority;
-	// 		}
-	// 	}
-	// }
 }
 
 /*======================================================================*
@@ -73,8 +45,7 @@ PUBLIC int sys_get_ticks()
                            sys_sleep
  *======================================================================*/
 PUBLIC int sys_sleep(int milli_seconds) {
-	p_proc_ready->wake_tick = get_ticks() + (milli_seconds / (1000 / HZ));
-	// p_proc_ready->wake_tick = milli_seconds / (1000 / HZ);
+	p_proc_ready->wake = get_ticks() + (milli_seconds / (1000 / HZ));
 	schedule();
 }
 
@@ -110,8 +81,8 @@ PUBLIC int sys_P(void *sem)
 	if (s->value < 0) {
 		// 将进程加入队列尾
 		p_proc_ready->status = 0;
-		p_proc_ready->isBlocked = TRUE;
-		s->pQueue[s->tail] = p_proc_ready;
+		p_proc_ready->is_blocked = TRUE;
+		s->wait_queue[s->tail] = p_proc_ready;
 		s->tail = (s->tail + 1) % NR_TASKS;
 		schedule();
 	}
@@ -128,9 +99,9 @@ PUBLIC int sys_V(void *sem)
 	s->value++;
 	if (s->value <= 0) {
 		// 释放队列头的进程
-		PROCESS *proc = s->pQueue[s->head];
+		PROCESS *proc = s->wait_queue[s->head];
 		proc->status = 0;
-		proc->isBlocked = FALSE;
+		proc->is_blocked = FALSE;
 		s->head = (s->head + 1) % NR_TASKS;
 	}
 	enable_irq(CLOCK_IRQ);
@@ -139,17 +110,17 @@ PUBLIC int sys_V(void *sem)
 /*======================================================================*
                            READER
  *======================================================================*/
-PUBLIC void READER(int time_slice)
+PUBLIC void READER(int work_time)
 {
 	switch (STRATEGY) {
 	case 0:
-		READER_rf(time_slice);
+		READER_rf(work_time);
 		break;
 	case 1:
-		READER_wf(time_slice);
+		READER_wf(work_time);
 		break;
 	default:
-		READER_fair(time_slice);
+		READER_fair(work_time);
 		break;
 	}
 }
@@ -157,17 +128,17 @@ PUBLIC void READER(int time_slice)
 /*======================================================================*
                            WRITER
  *======================================================================*/
-PUBLIC void WRITER(int time_slice)
+PUBLIC void WRITER(int work_time)
 {
 	switch (STRATEGY) {
 	case 0:
-		WRITER_rf(time_slice);
+		WRITER_rf(work_time);
 		break;
 	case 1:
-		WRITER_wf(time_slice);
+		WRITER_wf(work_time);
 		break;
 	default:
-		WRITER_fair(time_slice);
+		WRITER_fair(work_time);
 		break;
 	}
 }
@@ -175,143 +146,143 @@ PUBLIC void WRITER(int time_slice)
 /*======================================================================*
                            READER_rf
  *======================================================================*/
-void READER_rf(int time_slice)
+void READER_rf(int work_time)
 {
-	P(&mutex_readerNum);
-	if (readerNum == 0)
-		P(&writeBlock); // 有读者，则禁止写
-	readerNum++;
-	V(&mutex_readerNum);
+	P(&m_reader_count);
+	if (reader_count == 0)
+		P(&writer_block); // 有读者，则禁止写
+	reader_count ++;
+	V(&m_reader_count);
 
-	P(&readerLimit);
+	P(&reader_limit);
 	p_proc_ready->status = 1; // 状态设置为正在读
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 
-	P(&mutex_readerNum);
-	readerNum--;
-	if (readerNum == 0)
-		V(&writeBlock); // 无读者，可写
-	V(&mutex_readerNum);
+	P(&m_reader_count);
+	reader_count --;
+	if (reader_count == 0)
+		V(&writer_block); // 无读者，可写
+	V(&m_reader_count);
 
-	V(&readerLimit);
+	V(&reader_limit);
 }
 
 /*======================================================================*
                            WRITER_rf
  *======================================================================*/
-void WRITER_rf(int time_slice)
+void WRITER_rf(int work_time)
 {
-	P(&writeBlock);
+	P(&writer_block);
 
 	p_proc_ready->status = 1; // 状态设置为正在写
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 
-	V(&writeBlock);
+	V(&writer_block);
 }
 
 /*======================================================================*
                            READER_wf
  *======================================================================*/
-void READER_wf(int time_slice)
+void READER_wf(int work_time)
 {
-	P(&readerLimit);
+	P(&reader_limit);
 
-	P(&readBlock);
+	P(&reader_block);
 
-	P(&mutex_readerNum);
-	if (readerNum == 0)
-		P(&writeBlock); // 有读者，则禁止写
-	readerNum++;
-	V(&mutex_readerNum);
+	P(&m_reader_count);
+	if (reader_count == 0)
+		P(&writer_block); // 有读者，则禁止写
+	reader_count ++;
+	V(&m_reader_count);
 
-	V(&readBlock);
+	V(&reader_block);
 
 	// 进行读，对写操作加锁
 	p_proc_ready->status = 1;
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 
 	// 完成读
-	P(&mutex_readerNum);
-	readerNum--;
-	if (readerNum == 0)
-		V(&writeBlock); // 无读者，可写
-	V(&mutex_readerNum);
+	P(&m_reader_count);
+	reader_count --;
+	if (reader_count == 0)
+		V(&writer_block); // 无读者，可写
+	V(&m_reader_count);
 
-	V(&readerLimit);
+	V(&reader_limit);
 }
 
 /*======================================================================*
                            WRITER_wf
  *======================================================================*/
-void WRITER_wf(int time_slice)
+void WRITER_wf(int work_time)
 {
-	P(&mutex_writerNum);
-	if (writerNum == 0)
-		P(&readBlock); // 有写者，则禁止读
-	writerNum++;
-	V(&mutex_writerNum);
+	P(&m_writer_count);
+	if (writer_count == 0)
+		P(&reader_block); // 有写者，则禁止读
+	writer_count ++;
+	V(&m_writer_count);
 
 	// 开始写
-	P(&writeBlock);
+	P(&writer_block);
 
 	p_proc_ready->status = 1;
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 
-	V(&writeBlock);
+	V(&writer_block);
 	// 完成写
-	P(&mutex_writerNum);
-	writerNum--;
-	if (writerNum == 0)
-		V(&readBlock); // 无写者，可读
-	V(&mutex_writerNum);
+	P(&m_writer_count);
+	writer_count --;
+	if (writer_count == 0)
+		V(&reader_block); // 无写者，可读
+	V(&m_writer_count);
 
 }
 
 /*======================================================================*
                            READER_fair
  *======================================================================*/
-void READER_fair(int time_slice)
+void READER_fair(int work_time)
 {
 	// 开始读
-	P(&mutex_fair);
+	P(&S);
 
-	P(&readerLimit);
-	P(&mutex_readerNum);
-	if (readerNum == 0)
-		P(&writeBlock);
-	V(&mutex_fair);
+	P(&reader_limit);
+	P(&m_reader_count);
+	if (reader_count == 0)
+		P(&writer_block);
+	V(&S);
 
-	readerNum++;
-	V(&mutex_readerNum);
+	reader_count ++;
+	V(&m_reader_count);
 
 	// 进行读，对写操作加锁
 	p_proc_ready->status = 1;
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 
 	// 完成读
-	P(&mutex_readerNum);
-	readerNum--;
-	if (readerNum == 0)
-		V(&writeBlock);
-	V(&mutex_readerNum);
+	P(&m_reader_count);
+	reader_count --;
+	if (reader_count == 0)
+		V(&writer_block);
+	V(&m_reader_count);
 
-	V(&readerLimit);
+	V(&reader_limit);
 }
 
 /*======================================================================*
                            WRITER_fair
  *======================================================================*/
-void WRITER_fair(int time_slice)
+void WRITER_fair(int work_time)
 {
 
-	P(&mutex_fair);
-	P(&writeBlock);
-	V(&mutex_fair);
+	P(&S);
+	P(&writer_block);
+	V(&S);
 
 	// 开始写
 	p_proc_ready->status = 1;
-	milli_delay(time_slice * TIME_SLICE);
+	milli_delay(work_time * TIME_SLICE);
 	
 	// 完成写
-	V(&writeBlock);
+	V(&writer_block);
 }

@@ -37,9 +37,9 @@ typedef struct s_proc {
         int ticks;                 /* remained ticks */
         int priority;
 
-	int wake_tick;	/* 被唤醒时间 */
+	int wake;	/* 被唤醒时间 */
 	int status;		/* 进程状态 0--等待读写  1--正在读写  2--休息*/
-	int isBlocked; 	/* 是否被阻塞 */
+	int is_blocked; 	/* 是否被阻塞 */
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
@@ -75,5 +75,5 @@ typedef struct s_semaphore
 	int value;
 	int head;
 	int tail;
-	PROCESS * pQueue[NR_TASKS]; /* 等待信号量的进程队列 */
+	PROCESS * wait_queue[NR_TASKS]; /* 等待信号量的进程队列 */
 } SEMAPHORE;

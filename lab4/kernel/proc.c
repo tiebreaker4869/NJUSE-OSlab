@@ -185,7 +185,7 @@ void READER_rf(int time_slice)
 
 	P(&readerLimit);
 	p_proc_ready->status = 1; // 状态设置为正在读
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 
 	P(&mutex_readerNum);
 	readerNum--;
@@ -204,7 +204,7 @@ void WRITER_rf(int time_slice)
 	P(&writeBlock);
 
 	p_proc_ready->status = 1; // 状态设置为正在写
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 
 	V(&writeBlock);
 }
@@ -228,7 +228,7 @@ void READER_wf(int time_slice)
 
 	// 进行读，对写操作加锁
 	p_proc_ready->status = 1;
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 
 	// 完成读
 	P(&mutex_readerNum);
@@ -255,7 +255,7 @@ void WRITER_wf(int time_slice)
 	P(&writeBlock);
 
 	p_proc_ready->status = 1;
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 
 	V(&writeBlock);
 	// 完成写
@@ -286,7 +286,7 @@ void READER_fair(int time_slice)
 
 	// 进行读，对写操作加锁
 	p_proc_ready->status = 1;
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 
 	// 完成读
 	P(&mutex_readerNum);
@@ -310,7 +310,7 @@ void WRITER_fair(int time_slice)
 
 	// 开始写
 	p_proc_ready->status = 1;
-	sleep(time_slice * TIME_SLICE);
+	milli_delay(time_slice * TIME_SLICE);
 	
 	// 完成写
 	V(&writeBlock);
